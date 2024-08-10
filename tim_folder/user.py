@@ -6,7 +6,7 @@ class UserProfile:
     @staticmethod
     def createUser(userData):
         newUser = {
-                'userId': Identity.create_id(),
+                'id': Identity.create_id(),
                 'firstName': userData.get('firstName'),
                 'middleName': userData.get('middleName'),
                 'lastName': userData.get('lastName'),
@@ -14,7 +14,8 @@ class UserProfile:
                 'age': userData.get('age'),
                 'gender': userData.get('gender'),
                 'location': userData.get('location'),
-                'interests': userData.get('interests')
+                'interests': userData.get('interests'),
+                'password': userData.get('password')
         }
         # Save the user profile to the SQLite database
         conn = sqlite3.connect('tinder.db')
@@ -36,10 +37,10 @@ class UserProfile:
         interests_json = json.dumps(newUser['interests'])
 
         cursor.execute('''
-            INSERT INTO users (userId, firstName, middleName, lastName, email, age, gender, location, interests)
+            INSERT INTO users (id, firstName, middleName, lastName, email, age, gender, location, interests)
             VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
         ''', (
-            newUser['userId'],
+            newUser['id'],
             newUser['firstName'],
             newUser['middleName'],
             newUser['lastName'],
@@ -64,7 +65,7 @@ class UserProfile:
 
         # Query to retrieve user information based on userId
         cursor.execute('''
-            SELECT * FROM users WHERE userId = ?
+            SELECT * FROM users WHERE id = ?
         ''', (userId,))
 
         user = cursor.fetchone()
@@ -74,7 +75,7 @@ class UserProfile:
         if user:
             # Convert the user information to a dictionary
             userInfo = {
-                'userId': user['userId'],
+                'userId': user['id'],
                 'firstName': user['firstName'],
                 'middleName': user['middleName'],
                 'lastName': user['lastName'],
@@ -130,19 +131,50 @@ class UserProfile:
         conn.close()
 
         return {'message': 'User deleted successfully'}
+    # @staticmethod
+    # def sharedInterests(userId1, userId2):
+    #     # Connect to the database
+    #     conn = sqlite3.connect('tinder.db')
+    #     cursor = conn.cursor()
+
+    #     # Fetch interests for both users
+    #     cursor.execute('SELECT interests FROM users WHERE userId = ?', (userId1,))
+    #     user1_interests = cursor.fetchone()
+        
+    #     cursor.execute('SELECT interests FROM users WHERE userId = ?', (userId2,))
+    #     user2_interests = cursor.fetchone()
+
+    #     # Check if both users exist
+    #     if not user1_interests or not user2_interests:
+    #         conn.close()
+    #         return {'error': 'One or both users not found'}
+
+    #     # Convert JSON strings to Python lists
+    #     user1_interests = json.loads(user1_interests[0])
+    #     user2_interests = json.loads(user2_interests[0])
+
+    #     # Find the intersection (shared interests) between the two lists
+    #     shared_interests = set(user1_interests) & set(user2_interests)
+
+    #     # Close the database connection
+    #     conn.close()
+
+    #     # Return the count of shared interests
+    #     return {'sharedInterestsCount': len(shared_interests), 'sharedInterests': list(shared_interests)}
 
 
 
 #need to fetch userData from GUI
 userData = {
-    'firstName': 'Jane',
-    'middleName': 'Q',
+    'firstName':'Jane',
+    'middleName': 'Q', 
     'lastName': 'Doe',
     'email': 'jane.doe@example.com',
     'age': 28,
     'gender': 'female',
     'location': 'New York',
-    'interests': ['reading', 'traveling']
+    'interests': ['reading', 'traveling'],
+    'password': 'Welcome123!'
 }
 
 
@@ -158,6 +190,13 @@ updateData = {
 }
 
 # Attempt to update the user profile
-result = UserProfile.editUser('8b95686f518e4b458d4f6952c433434c', updateData)
-result = UserProfile.deleteUser('2da3f4f20daa4440a84bda8448b883b6')
-print(result)  # Print the result message
+# result = UserProfile.editUser('8b95686f518e4b458d4f6952c433434c', updateData)
+# result = UserProfile.deleteUser('2da3f4f20daa4440a84bda8448b883b6')
+# print(result)  # Print the result message
+
+# Example usage
+userId1 = '8b95686f518e4b458d4f6952c433434c'  # Replace with actual user ID
+userId2 = 'dea9cfb0f7244677b6f06bdde6308639'  # Replace with actual user ID
+
+# result = UserProfile.sharedInterests(userId1, userId2)
+# print(result)
