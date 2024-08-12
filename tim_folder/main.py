@@ -45,7 +45,7 @@ async def login(
     user = cursor.fetchone()
     cursor.execute("SELECT interests FROM users WHERE email = ?", (email,))
     interest=cursor.fetchone()
-    print(interest[0]=="null")
+    # print(interest[0]=="null")
     conn.close()
 
     if user:
@@ -96,11 +96,20 @@ async def register_user(
     user_profile.createUser(userData)
 
     # Optionally, you can pass a success message back to the template
-    return templates.TemplateResponse("register.html", {"request": request, "message": "User registered successfully"})
+    return RedirectResponse(url="/", status_code=302)
 
 @app.get("/dashboard")
 async def dashboard(request: Request):
-    return templates.TemplateResponse("dashboard.html", {"request": request, "message": "User logged in successfully"})
+    email = request.cookies.get("email")
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    cursor.execute("SELECT id FROM users WHERE email = ?", (email,))
+    userId = cursor.fetchone()
+    user_profile = UserProfile()
+
+    user = user_profile.viewUser(userId[0])
+
+    return templates.TemplateResponse("dashboard.html", {"request": request, "user": user, "message": "User logged in successfully"})
 
 @app.get("/submit-interests")
 async def interests(request: Request):
@@ -132,4 +141,4 @@ async def update_user_interests(
     userId = cursor.fetchone()
     
     user_profile.editUser(userId[0],userData)
-    return templates .TemplateResponse("dashboard.html", {"request": request, "message": "User interests logged"})
+    return RedirectResponse(url="/dashboard", status_code=302)
