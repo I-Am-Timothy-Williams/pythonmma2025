@@ -43,6 +43,23 @@
         .profile-info p, .tinder-profile p {
             margin: 0.5rem 0;
         }
+        .profile-table {
+    width: 100%;
+    border-collapse: collapse; /* Removes any default border spacing */
+}
+
+.profile-table td {
+    padding: 10px;
+    vertical-align: top;
+}
+
+.profile-table label {
+    font-weight: bold;
+}
+
+.profile-table p {
+    margin: 0;
+}
         .tinder-profile {
             border: 1px solid #ddd;
             border-radius: 4px;
@@ -68,15 +85,38 @@
         <!-- Profile Section -->
         <div class="profile-section">
             <h2>Profile</h2>
-            <div class="profile-info">
-                <label for="username">Username:</label>
-                <p id="username">JohnDoe</p>
-                <label for="email">Email:</label>
-                <p id="email">johndoe@example.com</p>
-                <label for="bio">Bio:</label>
-                <p id="bio">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam scelerisque urna at sollicitudin.</p>
-            </div>
+            <table class="profile-table">
+                <tr>
+                    <td><label for="firstName">First Name</label></td>
+                    <td><p id="firstName">{{user.get('firstName')}}</p></td>
+                    <td><label for="lastName">Last Name</label></td>
+                    <td><p id="lastName">{{user.get('lastName')}}</p></td>
+                </tr>
+                <tr>
+                    <td><label for="gender">Gender</label></td>
+                    <td><p id="gender">{{user.get('gender')}}</p></td>
+                    <td><label for="location">Location</label></td>
+                    <td><p id="location">{{user.get('location')}}</p></td>
+                </tr>
+                <tr>
+                    <td><label for="email">Email</label></td>
+                    <td><p id="email">{{user.get('email')}}</p></td>
+                    <td><label for="age">Age</label></td>
+                    <td><p id="age">{{user.get('age')}}</p></td>  
+                </tr>
+                <tr>
+                    <td><label for="interests">Interests</label></td>
+                    <td colspan="3">
+                        <p>
+                            {% for interest in user.get('interests') %}
+                            {{ interest.capitalize() }}{% if not loop.last %}, {% endif %}
+                            {% endfor %}
+                        </p>
+                    </td>
+                </tr>
+            </table>
         </div>
+    </div>
 
         <!-- Tinder Profiles Section -->
         <div class="tinder-profiles-section">
