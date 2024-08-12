@@ -37,8 +37,8 @@ class UserProfile:
         interests_json = json.dumps(newUser['interests'])
 
         cursor.execute('''
-            INSERT INTO users (id, firstName, middleName, lastName, email, age, gender, location, interests)
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+            INSERT INTO users (id, firstName, middleName, lastName, email, age, gender, location, interests, password)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
         ''', (
             newUser['id'],
             newUser['firstName'],
@@ -48,7 +48,8 @@ class UserProfile:
             newUser['age'],
             newUser['gender'],
             newUser['location'],
-            interests_json  # Store as a JSON string
+            interests_json,  # Store as a JSON string,
+            newUser['password'],
         ))
 
         conn.commit()
@@ -94,12 +95,14 @@ class UserProfile:
         conn = sqlite3.connect('tinder.db')
         cursor = conn.cursor()
 
+        updateData = {key: json.dumps(value) if isinstance(value, list) else value for key, value in updateData.items()}
+
         # Prepare SQL query and parameters for updating user info
         set_clause = ', '.join(f"{key} = ?" for key in updateData.keys())
         sql_query = f'''
             UPDATE users
             SET {set_clause}
-            WHERE userId = ?
+            WHERE id = ?
         '''
 
         # Execute the update query
@@ -118,7 +121,7 @@ class UserProfile:
 
         # Execute DELETE query
         cursor.execute('''
-            DELETE FROM users WHERE userId = ?
+            DELETE FROM users WHERE id = ?
         ''', (userId,))
 
         # Check if any rows were affected

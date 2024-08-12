@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Select Your Interests</title>
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f4;
+        }
+        .container {
+            width: 50%;
+            margin: auto;
+            padding: 2rem;
+            background-color: #fff;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+            text-align: center;
+        }
+        h1 {
+            margin-bottom: 2rem;
+        }
+        .interests {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+        .interest {
+            background: #ddd;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            padding: 10px;
+            margin: 5px;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+        .interest.selected {
+            background: #007BFF;
+            color: #fff;
+        }
+        .submit-btn {
+            margin-top: 2rem;
+            padding: 10px 20px;
+            background-color: #007BFF;
+            color: #fff;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+        .submit-btn:hover {
+            background-color: #0056b3;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Select Your Interests</h1>
+        <form id="interestsForm" method="POST" action="/submit-interests">
+            <div class="interests">
+                <!-- Interests to choose from -->
+                <div class="interest" data-value="sports">Sports</div>
+                <div class="interest" data-value="music">Music</div>
+                <div class="interest" data-value="travel">Travel</div>
+                <div class="interest" data-value="technology">Technology</div>
+                <div class="interest" data-value="fitness">Fitness</div>
+                <div class="interest" data-value="cooking">Cooking</div>
+                <div class="interest" data-value="art">Art</div>
+                <div class="interest" data-value="reading">Reading</div>
+                <!-- Add more interests as needed -->
+            </div>
+            <input type="hidden" name="interests" id="selectedInterests" value="">
+            <button type="submit" class="submit-btn">Submit</button>
+        </form>
+    </div>
+    <script>
+        const interests = document.querySelectorAll('.interest');
+        const selectedInterestsInput = document.getElementById('selectedInterests');
+        let selectedInterests = [];
+    
+        interests.forEach(interest => {
+            interest.addEventListener('click', () => {
+                const value = interest.getAttribute('data-value');
+                if (selectedInterests.includes(value)) {
+                    selectedInterests = selectedInterests.filter(i => i !== value);
+                    interest.classList.remove('selected');
+                } else {
+                    selectedInterests.push(value);
+                    interest.classList.add('selected');
+                }
+                selectedInterestsInput.value = selectedInterests.join(',');
+
+            });
+        });
+
+
+
+    </script>
+    
+</body>
+</html>
