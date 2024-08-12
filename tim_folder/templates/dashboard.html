@@ -75,6 +75,32 @@
             display: flex;
             flex-direction: column;
         }
+        /* Edit Button Container */
+.edit-button-container {
+    text-align: right;
+    margin-top: 20px;
+}
+
+/* Edit Button Styles */
+.btn-primary {
+    background-color: #007bff; /* Blue background */
+    color: #ffffff; /* White text */
+    padding: 10px 20px; /* Padding inside the button */
+    border-radius: 5px; /* Rounded corners */
+    text-decoration: none; /* Remove underline */
+    font-weight: bold; /* Make the text bold */
+    transition: background-color 0.3s ease, transform 0.3s ease; /* Smooth transition for hover effects */
+}
+
+.btn-primary:hover {
+    background-color: #0056b3; /* Darker blue on hover */
+    transform: scale(1.05); /* Slightly enlarge the button on hover */
+}
+
+.btn-primary:active {
+    background-color: #004080; /* Even darker blue when the button is pressed */
+    transform: scale(1); /* Reset the scale effect */
+}
     </style>
 </head>
 <body>
@@ -115,6 +141,10 @@
                     </td>
                 </tr>
             </table>
+            <!-- Edit Button -->
+        <div class="edit-button-container" style="text-align: right; margin-top: 20px;">
+            <a href="/edit-profile" class="btn btn-primary">Edit Profile</a>
+        </div>  
         </div>
     </div>
 
