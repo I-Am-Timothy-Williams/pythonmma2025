@@ -1,0 +1,124 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: "Poppins", sans-serif;
+}
+
+
+body {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    background: url('images/img.jpg') no-repeat;
+    background-size:cover;
+    background-position: center;
+}
+
+
+.wrapper {
+    width: 550px;
+    height: 325px;
+    color: black;
+    background:transparent;
+    border-radius: 30px;
+    backdrop-filter: blur(2px);
+    outline: 3px solid rgba(255, 255, 255, 0.5);
+}
+
+.wrapper h1 {
+    font-size: 35px;
+    text-align: center;
+}
+
+.wrapper .input_box {
+    position: relative;
+    width: 90%;
+    height: 40px;
+    display: block;
+    margin: 20px auto;
+}
+
+.input_box input {
+    width: 100%;
+    height: 100%;
+    background: transparent;
+    border: 2px solid rgba(255, 255, 255, .2);
+    border-radius: 40px;
+    font-size: 15px;
+    padding: 20px 40px 20px 20px
+}
+
+.input_box input::placeholder {
+    color: #fff;
+}
+
+.input_box i {
+    position: absolute;
+    right: 20px;
+    top: 30%;
+    transform:translate(-50%);
+    font-size: 20px
+}
+
+.wrapper .remember-forgot {
+    display: flex;
+    justify-content: space-between;
+    font-size: 14px;
+    width: 90%;
+    margin: 20px auto;
+    color: #fff
+}
+
+.remember-forgot label, .remember-forgot a {
+    margin: 0;
+}
+
+.remember-forgot label input {
+    accent-color: #fff;
+    margin-right: 3px;
+}
+
+.remember-forgot a {
+    color: #fff;
+    text-decoration: none;
+}
+
+.remember-forgot a:hover {
+    text-decoration: underline;
+    font-weight: 600;
+}
+
+.wrapper .btn {
+    width: 50%;
+    height: 45px;
+    background: #fff;
+    border: none;
+    outline: none;
+    border-radius: 40px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    cursor: pointer;
+    font-size: 16px;
+    color: #333;
+    font-weight: 600;
+    display: block;
+    margin: 20px auto;
+}
+
+.wrapper .register-link {
+    font-size: 14px;
+    text-align: center;
+    margin_up: 20px;
+    color: #fff;
+}
+
+.register-link p a{
+    color: #fff;
+    text-decoration: none;
+}
+
+.register-link p a:hover {
+    text-decoration: underline;
+    font-weight: 600;
+}
