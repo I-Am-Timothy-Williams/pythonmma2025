@@ -227,9 +227,11 @@
 
         class Carousel {
 
-            constructor(element) {
+            constructor(element, users) {
 
                 this.board = element
+                this.users = users;
+                this.currentIndex=0;
 
                 // add first two cards programmatically
                 this.push()
@@ -416,24 +418,71 @@
 
             }
 
-            push() {
+        //     push() {
 
-                let card = document.createElement('div')
+        //         let card = document.createElement('div')
 
-                card.classList.add('card')
+        //         card.classList.add('card')
 
-                card.style.backgroundImage =
-                    "url('https://picsum.photos/320/320/?random=" + Math.round(Math.random() * 1000000) + "')"
+        //         card.style.backgroundImage =
+        //             "url('https://picsum.photos/320/320/?random=" + Math.round(Math.random() * 1000000) + "')"
 
-                this.board.insertBefore(card, this.board.firstChild)
+        //         this.board.insertBefore(card, this.board.firstChild)
 
-            }
+        //     }
 
+        // }
+
+        push() {
+            console.log(this)
+        if (this.currentIndex < this.users.length) {
+            let user = this.users[this.currentIndex];
+            let card = document.createElement('div');
+            card.classList.add('card');
+
+            // Add user information to the card
+            card.innerHTML = `
+                    <h3> ${user.firstName} ${user.lastName}</h3>
+                    <p> Gender: ${user.gender}</p>
+                    <p> Age: ${user.age}</p>
+                    <p> Location: ${user.location}</p>
+                    <p> Email: ${user.email}</p>
+                    <p> Interests: ${user.interests.map(i => capitalize(i)).join(', ')}</p>
+            `;
+
+            this.board.insertBefore(card, this.board.firstChild);
+            this.currentIndex++;
         }
+    }
+}
+function capitalize(str) {
+    return str.charAt(0).toUpperCase() + str.slice(1);
+}
 
-        let board = document.querySelector('#board')
+// Example users array
+let users = [
+    {
+        firstName: "Cissy",
+        lastName: "He",
+        gender: "Female",
+        age: 26,
+        location: "China",
+        email: "cissy@yahoo.com",
+        interests: ["Technology", "Cooking", "Music"]
+    },
+    {
+        firstName: "John",
+        lastName: "Doe",
+        gender: "Male",
+        age: 30,
+        location: "USA",
+        email: "john@example.com",
+        interests: ["Reading", "Traveling", "Fitness"]
+    }
+];
 
-        let carousel = new Carousel(board)
+let board = document.querySelector('#board');
+let carousel = new Carousel(board, users);
     </script>
     </div>
     </div>
