@@ -36,6 +36,7 @@
             border-radius: 8px;
             box-shadow: 0 0 10px rgba(0,0,0,0.1);
         }
+        
         .profile-section h2, .tinder-profiles-section h2 {
             margin-top: 0;
         }
@@ -126,6 +127,20 @@
             background-color: white;
             transform: translateX(-50%) translateY(-50%) scale(0.95);
         }
+        .card2 {
+            width: 250px;
+            height: 300px;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            border-radius: 1%;
+            box-shadow: 0px 4px 4px 0px rgba(0, 0, 0, 0.1);
+            background-color: white;
+            transform: translateX(-50%) translateY(-50%) scale(0.95);
+        }
         .like {
             width: 50px;
             height: 50px;
@@ -152,7 +167,7 @@
     </header>
     <div class="container">
         <!-- Profile Section -->
-        <div class="profile-section">
+        <div id="profile-view" class="profile-section">
             <h2>Profile</h2>
             <table class="profile-table">
                 <tr>
@@ -186,11 +201,61 @@
             </table>
             <!-- Edit Button -->
         <div class="edit-button-container" style="text-align: right; margin-top: 20px;">
-            <a href="/edit-profile" class="btn btn-primary">Edit Profile</a>
+            <button id="edit-profile-button" class="btn btn-primary">Edit Profile</button>
         </div>  
         </div>
     </div>
-
+    <!-- Edit Form Section (Initially Hidden) -->
+    <div class="container">
+    <div id="edit-profile-form" class="profile-section" style="display: none;">
+        <h2>Update Profile</h2>
+        <form action="/update-profile" method="POST">
+            <table class="profile-table">
+                <tr>
+                    <td><label for="firstName">First Name</label></td>
+                    <td><input type="text" name="firstName" value="{{user.get('firstName')}}" /></td>
+                    <td><label for="lastName">Last Name</label></td>
+                    <td><input type="text" name="lastName" value="{{user.get('lastName')}}" /></td>
+                </tr>
+                <tr>
+                    <td><label for="gender">Gender</label></td>
+                    <td><input type="text" name="gender" value="{{user.get('gender')}}" /></td>
+                    <td><label for="location">Location</label></td>
+                    <td><input type="text" name="location" value="{{user.get('location')}}" /></td>
+                </tr>
+                <tr>
+                    <td><label for="email">Email</label></td>
+                    <td><input type="email" name="email" value="{{user.get('email')}}" /></td>
+                    <td><label for="age">Age</label></td>
+                    <td><input type="number" name="age" value="{{user.get('age')}}" /></td>  
+                </tr>
+                <tr>
+                    <td><label for="interests">Interests</label></td>
+                    <td colspan="3">
+                        <input type="text" name="interests" value="{{ ', '.join(user.get('interests')) }}" />
+                    </td>
+                </tr>
+            </table>
+            <div class="edit-button-container" style="text-align: right; margin-top: 20px;">
+                <button type="submit" class="btn btn-primary">Save Changes</button>
+                <button id="cancel-edit-button" class="btn btn-primary">Cancel</button>
+            </div>
+        </form>
+    </div>
+    </div>
+    <script>
+        document.getElementById('edit-profile-button').addEventListener('click', function(event) {
+            event.preventDefault();
+            document.getElementById('profile-view').style.display = 'none';
+            document.getElementById('edit-profile-form').style.display = 'block';
+        });
+    
+        document.getElementById('cancel-edit-button').addEventListener('click', function(event) {
+            event.preventDefault();
+            document.getElementById('edit-profile-form').style.display = 'none';
+            document.getElementById('profile-view').style.display = 'block';
+        });
+    </script>
         <!-- Tinder Profiles Section -->
        
         <!-- <div class="tinder-profiles-section">
@@ -453,6 +518,31 @@
             this.board.insertBefore(card, this.board.firstChild);
             this.currentIndex++;
         }
+        else if (this.currentIndex >= this.users.length) {
+            let text = "No more users for now!";
+            // let card = document.createElement('div');
+            // card.classList.add('card');
+            // card.innerHTML = `
+            //         <h3>No more users for now!</h3>
+            // `;
+            // this.board.insertBefore(card, this.board.firstChild);
+            
+            if (!this.noMoreMessage) {
+            
+            this.noMoreMessage = document.createElement('div');
+            let final = this.noMoreMessage
+            final.classList.add('card2');
+            this.noMoreMessage.innerHTML = `
+                <br><br><br><br><br><br>
+                <h3>No more users for now!</h3>
+            `;
+        }
+        if (!this.board.contains(this.noMoreMessage)) {
+            let final = this.noMoreMessage
+            this.board.insertBefore(final, this.board.firstChild);
+        }
+
+        }
     }
 }
 function capitalize(str) {
@@ -482,7 +572,10 @@ let users = [
 ];
 
 let board = document.querySelector('#board');
-let carousel = new Carousel(board, users);
+window.addEventListener('DOMContentLoaded', () => {
+        let carousel = new Carousel(board, users);
+        this.currentIndex=0;
+    });
     </script>
     </div>
     </div>
