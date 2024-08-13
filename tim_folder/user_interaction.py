@@ -115,7 +115,7 @@ class UserInteraction:
             else:  # Alice is user2
                 print(
                     f"Matched with: {match[1]} {match[2]} - Age: {match[3]}, Gender: {match[4]}, Location: {match[5]}, Interests: {match[6]}")
-
+        return
         # Close the connection
         conn.close()
 
