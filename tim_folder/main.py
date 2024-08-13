@@ -23,6 +23,32 @@ def hash_password(password: str) -> str:
     # Hashing the password for comparison
     return hashlib.sha256(password.encode()).hexdigest()
 
+def fetch_all_users(current_user_id, conn):
+    cursor = conn.cursor()
+    cursor.execute("SELECT * FROM users")
+    users = cursor.fetchall()
+
+    all_users = []
+    for user in users:
+        if user['id'] == current_user_id:
+            continue  # Skip the current user's row
+
+        interests_array = json.loads(user['interests']) if isinstance(user['interests'], str) else user['interests']
+        if interests_array is None:
+            interests_array = ["None"]
+        
+        all_users.append({
+            "firstName": user['firstName'],
+            "lastName": user['lastName'],
+            "gender": user['gender'],
+            "age": user['age'],
+            "location": user['location'],
+            "email": user['email'],
+            "interests": interests_array,
+        })
+    return all_users
+
+
 # Mount the static directory
 app.mount("/tim_folder/static", StaticFiles(directory="tim_folder/static"), name="static")
 
@@ -109,7 +135,42 @@ async def dashboard(request: Request):
 
     user = user_profile.viewUser(userId[0])
 
-    return templates.TemplateResponse("dashboard.html", {"request": request, "user": user, "message": "User logged in successfully"})
+    all_users = fetch_all_users(userId[0],get_db_connection())
+
+    return templates.TemplateResponse("dashboard.html", {"request": request,"all_users":all_users, "user": user, "message": "User logged in successfully"})
+@app.post("/dashboard")
+async def get_users(
+    request: Request,
+    firstName: str = Form(...),
+    lastName: str = Form(...),
+    email: str = Form(...),
+    age: int = Form(...),
+    gender: str = Form(...),
+    location: str = Form(...),
+    interests: str = Form(None)):
+
+    user_profile = UserProfile()
+
+    # Call the create_user_profile method with the form data
+    userData = {
+    'firstName':firstName,
+    'middleName': None, 
+    'lastName': lastName,
+    'email': email,
+    'age': age,
+    'gender': gender,   
+    'location': location,
+    'interests': interests,
+    }
+
+    email = request.cookies.get("email")
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    cursor.execute("SELECT id FROM users WHERE email = ?", (email,))
+    userId = cursor.fetchone()
+    user_profile.editUser(userId[0],userData)
+
+    return RedirectResponse(url="/dashboard", status_code=302)
 
 @app.get("/submit-interests")
 async def interests(request: Request):
