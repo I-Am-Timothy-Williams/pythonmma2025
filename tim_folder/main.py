@@ -147,9 +147,12 @@ async def get_users(
     age: int = Form(...),
     gender: str = Form(...),
     location: str = Form(...),
-    interests: str = Form(None)):
+    interests: str = Form(...)):
 
     user_profile = UserProfile()
+
+    interests_list = [interest.strip() for interest in interests.split(',')]
+    interests_json = json.dumps(interests_list)
 
     # Call the create_user_profile method with the form data
     userData = {
@@ -160,7 +163,7 @@ async def get_users(
     'age': age,
     'gender': gender,   
     'location': location,
-    'interests': interests,
+    'interests': interests_json,
     }
 
     email = request.cookies.get("email")
