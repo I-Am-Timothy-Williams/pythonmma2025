@@ -5,48 +5,52 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Register</title>
 </head>
+<link rel="stylesheet" type="text/css" href="/tim_folder/static/styles.css">
+<link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
 <body>
-    <div class="register-container">
-        <h2>Register</h2>
+    <div class="logo2">
+        <img src="tim_folder/static/tinder.png" alt="Logo">
+    </div>
+    <div class="wrapper2">
+        <h2>   Register</h2>
         
         <form id="registerForm" method="POST" action="/register">
-            <div class="input-group">
-                <label for="firstName">First Name</label>
+            <div class="input_box2">
                 <input type="text" id="firstName" name="firstName" placeholder="Enter your first name">
+                <i class='bx bxs-user-circle' ></i>
             </div>
-            <div class="input-group">
-                <label for="lastName">Last Name</label>
+            <div class="input_box2">
                 <input type="text" id="lastName" name="lastName" placeholder="Enter your last name">
+                <i class='bx bxs-user-circle' ></i>
             </div>
-            <div class="input-group">
-                <label for="email">Email</label>
+            <div class="input_box2">
                 <input type="email" id="email" name="email" placeholder="Enter your email">
+                <i class='bx bxs-user-circle' ></i>
             </div>
-            <div class="input-group">
-                <label for="age">Age</label>
-                <input type="integer" id="age" name="age">
+            <div class="input_box2">
+                <input type="integer" id="age" name="age" placeholder="Enter your age">
+                <i class='bx bxs-user-circle' ></i>
             </div>
-            <div class="input-group">
-                    <label for="gender">Gender</label>
-                    <input type="text" id="gender" name="gender">
+            <div class="input_box2">
+                    <input type="text" id="gender" name="gender" placeholder="Enter your gender">
+                    <i class='bx bxs-user-circle' ></i>
             </div>
-            <div class="input-group">
-                <label for="location">Location</label>
-                <input type="text" id="location" name="location">
+            <div class="input_box2">
+                <input type="text" id="location" name="location" placeholder="Enter your location">
+                <i class='bx bxs-user-circle' ></i>
             </div>
                 
-            <div class="input-group">
-                <label for="username">Username</label>
+            <div class="input_box2">
                 <input type="text" id="username" name="username" placeholder="Create a username">
+                <i class='bx bxs-user-circle' ></i>
             </div>
             
-            <div class="input-group">
-                <label for="password">Password</label>
+            <div class="input_box2">
                 <input type="password" id="password" name="password" placeholder="Create a password">
+                <i class='bx bxs-user-circle' ></i>
             </div>
             
-            </div>
-            <button type="submit">Register</button>
+            <button type="submit" class="btn">Register</button>
         </form>
     </div>
 </body>

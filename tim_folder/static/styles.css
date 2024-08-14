@@ -1,4 +1,4 @@
-body {
+/* body {
     font-family: Arial, sans-serif;
     background-color: #f4f4f4;
     display: flex;
@@ -6,7 +6,7 @@ body {
     align-items: center;
     height: 100vh;
     margin: 0;
-}
+} */
 
 .login-container {
     background-color: white;
@@ -28,7 +28,7 @@ body {
 
 .input-group label {
     display: block;
-    margin-bottom: 0.5rem;
+    margin-bottom: 0.3rem;
 }
 
 .input-group input {
@@ -57,4 +57,229 @@ button:hover {
 #error-message {
     color: red;
     margin-top: 1rem;
+}
+
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: "Poppins", sans-serif;
+}
+html, body {
+    height: 100%;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    background: url('https://gizmodo.com/app/uploads/2024/02/0aef34005447b6e41de0bab118032655.jpg') no-repeat;
+    background-size:cover;
+    background-position: center;
+}
+
+
+.wrapper {
+    width: 550px;
+    height: 325px;
+    position: absolute;
+    top:40%;
+    color: black;
+    background:white;
+    border-radius: 30px;
+    backdrop-filter: blur(2px);
+    outline: 3px solid rgba(83, 205, 230, 0.5);
+}
+
+.wrapper2 {
+    width: 700px;
+    height: 650px;
+    position: absolute;
+    top:32%;
+    color: black;
+    background:white;
+    border-radius: 30px;
+    backdrop-filter: blur(2px);
+    outline: 3px solid rgba(83, 205, 230, 0.5);
+}
+
+.wrapper h1 {
+    font-size: 35px;
+    text-align: center;
+    color: rgb(0, 0, 0);
+}
+
+.wrapper2 h2 {
+    font-size: 35px;
+    text-align: center;
+    color: rgb(0, 0, 0);
+}
+
+.wrapper .input_box {
+    position: relative;
+    width: 90%;
+    height: 40px;
+    display: block;
+    border-radius: 30px;
+    outline: 3px solid rgba(83, 205, 230, 0.5);
+    margin: 20px auto;
+}
+.wrapper2 .input_box2 {
+    position: relative;
+    width: 90%;
+    height: 40px;
+    display: block;
+    border-radius: 30px;
+    outline: 3px solid rgba(83, 205, 230, 0.5);
+    margin: 20px auto;
+}
+.input_box input {
+    width: 100%;
+    height: 100%;
+    background: transparent;
+    border: 2px solid rgba(255, 255, 255, .2);
+    border-radius: 40px;
+    font-size: 15px;
+    padding: 20px 40px 20px 20px
+}
+
+.input_box input::placeholder {
+    color: #000000;
+}
+
+.input_box i {
+    position: absolute;
+    right: 20px;
+    top: 30%;
+    transform:translate(-50%);
+    font-size: 20px
+}
+.input_box2 input {
+    width: 100%;
+    height: 100%;
+    background: transparent;
+    border: 2px solid rgba(255, 255, 255, .2);
+    border-radius: 40px;
+    font-size: 15px;
+    padding: 20px 40px 20px 20px
+
+}
+
+.input_box2 input::placeholder {
+    color: #000000;
+}
+
+.input_box2 i {
+    position: absolute;
+    right: 20px;
+    top: 30%;
+    transform:translate(-50%);
+    font-size: 20px
+}
+
+.wrapper .remember-forgot {
+    display: flex;
+    justify-content: space-between;
+    font-size: 14px;
+    width: 90%;
+    margin: 20px auto;
+    color: #000000
+}
+
+.remember-forgot label, .remember-forgot a {
+    margin: 0;
+}
+
+.remember-forgot label input {
+    accent-color: #000000;
+    margin-right: 3px;
+}
+
+.remember-forgot a {
+    color: #000000;
+    text-decoration: none;
+}
+
+.remember-forgot a:hover {
+    text-decoration: underline;
+    font-weight: 600;
+}
+
+.btn {
+    width: 50%;
+    height: 45px;
+    background: #fff;
+    border: none;
+    outline: none;
+    border-radius: 40px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    cursor: pointer;
+    font-size: 16px;
+    color: #333;
+    font-weight: 600;
+    display: block;
+    margin: 20px auto;
+}
+
+.wrapper .btn:hover {
+    background-color: #218838;
+}
+
+.btn2 {
+    width: 50%;
+    height: 45px;
+    background: #fff;
+    border: none;
+    outline: none;
+    border-radius: 40px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    cursor: pointer;
+    font-size: 16px;
+    color: #333;
+    font-weight: 600;
+    display: block;
+    margin: 20px auto;
+}
+
+.wrapper .register-link {
+    font-size: 14px;
+    text-align: center;
+    margin_up: 20px;
+    color: #000000;
+}
+
+.register-link p a{
+    color: #000000;
+    text-decoration: none;
+}
+
+.register-link p a:hover {
+    text-decoration: underline;
+    font-weight: 600;
+}
+
+.logo {
+    position: absolute;
+    top: 2%;
+    right: 39%;
+}
+
+.logo img {
+    width: 400px; /* Adjust the width as needed */
+    height: auto; /* Keeps the aspect ratio */
+}
+
+.logo2 {
+    position: absolute;
+    top: 0px;
+    right: 41.5%;
+}
+
+.logo2 img {
+    width: 300px; /* Adjust the width as needed */
+    height: auto; /* Keeps the aspect ratio */
 }
