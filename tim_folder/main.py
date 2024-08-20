@@ -12,23 +12,54 @@ from typing import List
 import json
 from similarity_score import *
 
-
+# Import the necessary modules and classes
 app = FastAPI()
 
 def get_db_connection():
+    """
+    Establish a connection to the SQLite database.
+    
+    Returns:
+        sqlite3.Connection: A connection object for interacting with the SQLite database.
+    """
     conn = sqlite3.connect('tinder.db')  # Update with your database file
     conn.row_factory = sqlite3.Row    
     return conn
 
 def hash_password(password: str) -> str:
-    # Hashing the password for comparison
+    """
+    Hash a password using SHA-256.
+    
+    Args:
+        password (str): The plain-text password to be hashed.
+        
+    Returns:
+        str: The hashed password in hexadecimal format.
+    """
     return hashlib.sha256(password.encode()).hexdigest()
 
 class SwipeRequest(BaseModel):
+    """
+    A Pydantic model for handling swipe requests.
+    
+    Attributes:
+        userId (str): The ID of the user who is swiping.
+        direction (str): The direction of the swipe, either "left" or "right".
+    """
     userId: str
     direction: str  # "left" or "right"
 
 def fetch_all_users(current_user_id, conn):
+    """
+    Fetch all users from the database except the current user.
+    
+    Args:
+        current_user_id (str): The ID of the current user.
+        conn (sqlite3.Connection): The database connection object.
+        
+    Returns:
+        List[dict]: A list of dictionaries containing user information.
+    """
     cursor = conn.cursor()
     cursor.execute("SELECT * FROM users")
     users = cursor.fetchall()
