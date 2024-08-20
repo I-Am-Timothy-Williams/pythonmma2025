@@ -265,21 +265,21 @@ body {
 .logo {
     position: absolute;
     top: 2%;
-    right: 39%;
+    right: 25%;
 }
 
 .logo img {
-    width: 400px; /* Adjust the width as needed */
+    width: 35px; /* Adjust the width as needed */
     height: auto; /* Keeps the aspect ratio */
 }
 
 .logo2 {
-    position: absolute;
+    position: relative;
     top: 0px;
-    right: 41.5%;
+    right: 35%;
 }
 
 .logo2 img {
-    width: 300px; /* Adjust the width as needed */
+    width: 400px; /* Adjust the width as needed */
     height: auto; /* Keeps the aspect ratio */
 }
