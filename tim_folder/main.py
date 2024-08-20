@@ -1,15 +1,16 @@
-from fastapi import FastAPI, Request, Form, HTTPException
+from fastapi import FastAPI, Request, Form, HTTPException, Body
 from fastapi.responses import RedirectResponse, HTMLResponse
 from fastapi.templating import Jinja2Templates
 from fastapi.staticfiles import StaticFiles
 from user import UserProfile
+from user_interaction import UserInteraction
 import sqlite3
 from pydantic import BaseModel
 import hashlib
 from urllib.parse import urlencode
 from typing import List
 import json
-
+from similarity_score import *
 
 
 app = FastAPI()
@@ -22,6 +23,10 @@ def get_db_connection():
 def hash_password(password: str) -> str:
     # Hashing the password for comparison
     return hashlib.sha256(password.encode()).hexdigest()
+
+class SwipeRequest(BaseModel):
+    userId: str
+    direction: str  # "left" or "right"
 
 def fetch_all_users(current_user_id, conn):
     cursor = conn.cursor()
@@ -47,6 +52,42 @@ def fetch_all_users(current_user_id, conn):
             "interests": interests_array,
         })
     return all_users
+
+def fetch_all_matches(current_user_id, conn):
+    cursor = conn.cursor()
+    cursor.execute("SELECT * FROM userMatches")
+    users = cursor.fetchall()
+
+    all_matches = []
+    for user in users:
+        if user['user1Id'] != current_user_id:
+            if user['user2Id'] != current_user_id:
+                continue  # Skip the current user's row
+
+        
+
+        if user['user1Id'] == current_user_id:
+            cursor.execute("SELECT * FROM users WHERE id = ?",(user['user2Id'],))
+            match = cursor.fetchone()
+        else:
+            cursor.execute("SELECT * FROM users WHERE id = ?",(user['user1Id'],))
+            match = cursor.fetchone()
+        
+        interests_array = json.loads(match['interests']) if isinstance(match['interests'], str) else match['interests']
+        if interests_array is None:
+            interests_array = ["None"]
+
+        all_matches.append({
+            "firstName": match['firstName'],
+            "lastName": match['lastName'],
+            "gender": match['gender'],
+            "age": match['age'],
+            "location": match['location'],
+            "email": match['email'],
+            "interests": interests_array,
+        })
+    return all_matches
+
 
 
 # Mount the static directory
@@ -133,11 +174,30 @@ async def dashboard(request: Request):
     userId = cursor.fetchone()
     user_profile = UserProfile()
 
-    user = user_profile.viewUser(userId[0])
+    user2 = user_profile.viewUser(userId[0])
 
     all_users = fetch_all_users(userId[0],get_db_connection())
+    print(all_users)
 
-    return templates.TemplateResponse("dashboard.html", {"request": request,"all_users":all_users, "user": user, "message": "User logged in successfully"})
+    all_matches = []
+    all_users2 = calculate_similarity(db_name='tinder.db', user_id=userId[0])
+
+    for user in all_users2:
+        interests_array = json.loads(user[8]) if isinstance(user[8], str) else user[8]
+        if interests_array is None:
+            interests_array = ["None"]
+        all_matches.append({
+            "firstName": user[1],
+            "lastName": user[3],
+            "gender": user[6],
+            "age": user[5],
+            "location": user[7],
+            "email": user[4],
+            "interests": interests_array,
+        })
+    print(all)
+
+    return templates.TemplateResponse("dashboard.html", {"request": request,"all_users":all_matches, "user": user2, "message": "User logged in successfully"})
 @app.post("/dashboard")
 async def get_users(
     request: Request,
@@ -206,3 +266,56 @@ async def update_user_interests(
     
     user_profile.editUser(userId[0],userData)
     return RedirectResponse(url="/dashboard", status_code=302)
+
+@app.post("/swipe")
+async def handle_swipe(request: Request, direction: str = Body(...), email: str = Body(...)):
+    # Handle the swipe logic (e.g., save to database)
+    userEmail = request.cookies.get("email")
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    cursor.execute("SELECT id FROM users WHERE email = ?", (userEmail,))
+    userId = cursor.fetchone()
+
+    user_interaction = UserInteraction()
+
+    if direction == "right":
+        # Handle like logic
+        print(direction,email)
+        cursor = conn.cursor()
+        cursor.execute("SELECT id FROM users WHERE email = ?", (email,))
+        likedUserId = cursor.fetchone()
+        user_interaction.likeUser(userId[0],likedUserId[0])
+
+    elif direction == "left":
+        # Handle dislike logic
+        print(direction,email)
+        cursor = conn.cursor()
+        cursor.execute("SELECT id FROM users WHERE email = ?", (email,))
+        dislikedUserId = cursor.fetchone()
+        user_interaction.dislikeUser(userId[0],dislikedUserId[0])
+        pass
+
+    return {"message": "Swipe registered successfully"}
+
+@app.get("/matches")
+async def view_matches(request:Request):
+    userEmail = request.cookies.get("email")
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    cursor.execute("SELECT id FROM users WHERE email = ?", (userEmail,))
+    userId = cursor.fetchone()
+    all_matches = fetch_all_matches(userId[0],get_db_connection())
+    print(all_matches)
+
+    return templates.TemplateResponse("matches.html", {"all_matches":all_matches, "request": request, "message": "View your matches"})
+
+@app.post("/delete-profile")
+async def delete_user(request:Request):
+    user_profile = UserProfile()
+    userEmail = request.cookies.get("email")
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    cursor.execute("SELECT id FROM users WHERE email = ?", (userEmail,))
+    userId = cursor.fetchone()
+    user_profile.deleteUser(userId[0])
+    return RedirectResponse(url="/", status_code=302)
