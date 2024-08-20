@@ -3,7 +3,7 @@ from identity import Identity
 from user import UserProfile
 class UserInteraction:
     @staticmethod
-    def likeUser(userId,likeduserId):
+    def likeUser(userId,likedUserId):
         # Connect to the database
         conn = sqlite3.connect('tinder.db')
         cursor = conn.cursor()
@@ -11,6 +11,14 @@ class UserInteraction:
         # Generate a unique ID for the like
         likeId = Identity.create_id()
 
+        cursor.execute('''
+        SELECT * FROM userLikes WHERE userId = ? AND userLikes = ?
+''',(userId,likedUserId))
+        user = cursor.fetchone()
+        if user:
+            print('hi im user', userId,likedUserId)
+            return {'message': 'User already liked'}
+        print('hi')
         # Insert the like information into the userLikes table
         cursor.execute('''
             INSERT INTO userLikes (id, userId, userLikes, dateCreated)
@@ -18,12 +26,13 @@ class UserInteraction:
         ''', (
             likeId,       # Generated unique ID
             userId,       # The ID of the user who is liking someone
-            likeduserId   # The ID of the user who is being liked
+            likedUserId   # The ID of the user who is being liked
         ))
 
         # Commit the transaction and close the connection
         conn.commit()
-        match = UserInteraction.checkMatches(userId, likeduserId, cursor)
+        print('hi im user', userId,likedUserId  )
+        match = UserInteraction.checkMatches(userId, likedUserId, cursor)
         conn.close()
 
         if match:
