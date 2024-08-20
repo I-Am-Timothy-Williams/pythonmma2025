@@ -202,14 +202,17 @@
             <!-- Edit Button -->
         <div class="edit-button-container" style="text-align: right; margin-top: 20px;">
             <button id="edit-profile-button" class="btn btn-primary">Edit Profile</button>
-        </div>  
+            <form action="/delete-profile" method="POST" style="display: inline;">
+                <button type="submit" class="btn btn-primary" onclick="return confirm('Are you sure you want to delete your profile?');">Delete Profile</button>
+            </form> 
+        </div> 
         </div>
     </div>
     <!-- Edit Form Section (Initially Hidden) -->
     <div class="container">
     <div id="edit-profile-form" class="profile-section" style="display: none;">
         <h2>Update Profile</h2>
-        <form action="/update-profile" method="POST">
+        <form action="/dashboard" method="POST">
             <table class="profile-table">
                 <tr>
                     <td><label for="firstName">First Name</label></td>
@@ -257,7 +260,10 @@
         });
     </script>
         <header>
-            <h1>Find Your Match!</h1>
+            <h1>Find Your Match! <div style="text-align: center; margin-top: -37px;">
+                <a href="/matches" class="btn-primary" style="margin-left: 1300px;">View Matches</a>
+            </div></h1>
+            
         </header>
         <div class="container2">
         <div id="board">
@@ -274,15 +280,18 @@
                     this.board = element;
                     this.users = users;
                     this.currentIndex = 0;
-        
+                    this.direction = "";
                     // Add the first two cards programmatically
+                    console.log(this.users[this.currentIndex]["email"], this.currentIndex)
                     this.push();
+                    console.log(this.users[this.currentIndex]["email"])
                     this.push();
         
                     // Handle gestures
                     this.handle();
                 }
-        
+                
+
                 handle() {
                     this.cards = this.board.querySelectorAll('.card');
                     this.topCard = this.cards[this.cards.length - 1];
@@ -307,7 +316,6 @@
                     let rotateY = 15 * (propX < 0.05 ? -1 : 1);
                     this.topCard.style.transition = 'transform 100ms ease-out';
                     this.topCard.style.transform = `translateX(-50%) translateY(-50%) rotate(0deg) rotateY(${rotateY}deg) scale(1)`;
-        
                     setTimeout(() => {
                         this.topCard.style.transform = 'translateX(-50%) translateY(-50%) rotate(0deg) rotateY(0deg) scale(1)';
                     }, 100);
@@ -351,9 +359,20 @@
                         if (propX > 0.25 && e.direction == Hammer.DIRECTION_RIGHT) {
                             successful = true;
                             posX = this.board.clientWidth;
+                            // User liked the profile (Right swipe)
+                            console.log('hi');
+                            
+                            // submitSwipe("right");
+                            this.direction = "right";
+
+
                         } else if (propX < -0.25 && e.direction == Hammer.DIRECTION_LEFT) {
                             successful = true;
                             posX = -(this.board.clientWidth + this.topCard.clientWidth);
+                            // User disliked the profile (Left swipe)
+                            // submitSwipe("left");
+                            this.direction ="left";
+
                         } else if (propY < -0.25 && e.direction == Hammer.DIRECTION_UP) {
                             successful = true;
                             posY = -(this.board.clientHeight + this.topCard.clientHeight);
@@ -366,6 +385,8 @@
                                 this.push();
                                 this.handle();
                             }, 200);
+                            console.log('i got removed!',this.users[this.currentIndex-2]["email"], this.direction)
+                            submitSwipe(this.direction,this.users[this.currentIndex-2]["email"])
                         } else {
                             this.topCard.style.transform = 'translateX(-50%) translateY(-50%) rotate(0deg) rotateY(0deg) scale(1)';
                             if (this.nextCard) this.nextCard.style.transform = 'translateX(-50%) translateY(-50%) rotate(0deg) rotateY(0deg) scale(0.95)';
@@ -378,6 +399,8 @@
                         let user = this.users[this.currentIndex];
                         let card = document.createElement('div');
                         card.classList.add('card');
+
+
         
                         card.innerHTML = `
                             <h3>${user.firstName} ${user.lastName}</h3>
@@ -402,6 +425,7 @@
                         if (!this.board.contains(this.noMoreMessage)) {
                             this.board.insertBefore(this.noMoreMessage, this.board.firstChild);
                         }
+                        this.currentIndex++;
                     }
                 }
             }
@@ -409,6 +433,29 @@
             function capitalize(str) {
                 return str.charAt(0).toUpperCase() + str.slice(1);
             }
+            function submitSwipe(direction,email) {
+                console.log('im submit swipe');                
+             // Example: POST request to FastAPI with user information and swipe direction
+            fetch("/swipe", {
+                method: "POST",
+                body: JSON.stringify({
+                    email: email,
+                    direction: direction  // "left" or "right"
+                }),
+                headers: {
+                    'Content-Type': 'application/json',
+                 }
+                
+    })
+    .then(response => response.json())
+    .then(data => {
+        console.log('Success:', data);
+    })
+    .catch((error) => {
+        console.error('Error:', "error");
+    });
+}
+
         
             let users = {{ all_users | tojson | safe }};
         
