@@ -140,6 +140,13 @@ templates = Jinja2Templates(directory="tim_folder/templates")
 
 @app.get("/")
 def read_root(request: Request):
+   """
+   - Handles GET requests to the root URL ("/").
+   - Renders and returns the "index.html" template as the homepage or login page.
+   - Arguments:
+     - request: The HTTP request object.
+   - Returns: A TemplateResponse with the "index.html" template.
+   """
     return templates.TemplateResponse("index.html", {"request": request})
 @app.post("/")
 async def login(
