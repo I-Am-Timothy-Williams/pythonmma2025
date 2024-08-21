@@ -85,6 +85,17 @@ def fetch_all_users(current_user_id, conn):
     return all_users
 
 def fetch_all_matches(current_user_id, conn):
+    """
+    Fetch all users matched with the current user from the database.
+
+    Args:
+        current_user_id (str): The ID of the current user.
+        conn (sqlite3.Connection): The database connection object.
+
+    Returns:
+        List[dict]: A list of dictionaries containing matched user information, 
+                    including their first name, last name, gender, age, location, email, and interests.
+    """
     cursor = conn.cursor()
     cursor.execute("SELECT * FROM userMatches")
     users = cursor.fetchall()
