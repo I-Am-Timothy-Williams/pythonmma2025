@@ -64,10 +64,11 @@ def create_userDislikes_table():
     conn.close()
     return
 def create_userMatches_table():
+    # Connect to the database
     conn = sqlite3.connect('tinder.db')
     cursor = conn.cursor()
 
-    # Create the userDislikes table
+    # Create the userMatches table
     cursor.execute('''
     CREATE TABLE IF NOT EXISTS userMatches(
         id TEXT PRIMARY KEY NOT NULL,
