@@ -188,6 +188,7 @@ async def login(
 
 @app.get("/register")
 def read_root(request: Request):
+    # Renders the registration page when a GET request is made to "/register"
     return templates.TemplateResponse("register.html", {"request": request})
 
 @app.post("/register")
@@ -203,6 +204,11 @@ async def register_user(
     password: str = Form(...),
     interests: str = Form(None)
 ):
+    """
+    Handles user registration by accepting form data, creating a new user profile, 
+    and storing the user information in the database.
+    """
+    
     # Create an instance of your UserProfile class
     user_profile = UserProfile()
 
@@ -225,21 +231,32 @@ async def register_user(
 
 @app.get("/dashboard")
 async def dashboard(request: Request):
+    # Retrieve the user's email from cookies
     email = request.cookies.get("email")
+
+    # Establish a connection to the database
     conn = get_db_connection()
     cursor = conn.cursor()
+
+    # Fetch the user ID based on the email
     cursor.execute("SELECT id FROM users WHERE email = ?", (email,))
     userId = cursor.fetchone()
+
+     # Create an instance of UserProfile to interact with the user's profile
     user_profile = UserProfile()
 
+    # Retrieve the user's profile information
     user2 = user_profile.viewUser(userId[0])
 
+    # Fetch all other users except the current user
     all_users = fetch_all_users(userId[0],get_db_connection())
     print(all_users)
 
     all_matches = []
+    # Calculate similarity scores with other users
     all_users2 = calculate_similarity(db_name='tinder.db', user_id=userId[0])
 
+    # Iterate through users with calculated similarity
     for user in all_users2:
         interests_array = json.loads(user[8]) if isinstance(user[8], str) else user[8]
         if interests_array is None:
@@ -255,7 +272,9 @@ async def dashboard(request: Request):
         })
     print(all)
 
+    # Render the dashboard template with the user's data and matches
     return templates.TemplateResponse("dashboard.html", {"request": request,"all_users":all_matches, "user": user2, "message": "User logged in successfully"})
+
 @app.post("/dashboard")
 async def get_users(
     request: Request,
@@ -267,8 +286,10 @@ async def get_users(
     location: str = Form(...),
     interests: str = Form(...)):
 
+    # Create an instance of UserProfile to interact with the user's profile    
     user_profile = UserProfile()
 
+    # Convert the comma-separated interests string into a list and then to JSON
     interests_list = [interest.strip() for interest in interests.split(',')]
     interests_json = json.dumps(interests_list)
 
@@ -284,17 +305,26 @@ async def get_users(
     'interests': interests_json,
     }
 
+    # Retrieve the user's email from cookies
     email = request.cookies.get("email")
+
+    # Establish a connection to the database
     conn = get_db_connection()
     cursor = conn.cursor()
+
+    # Fetch the user ID based on the email
     cursor.execute("SELECT id FROM users WHERE email = ?", (email,))
     userId = cursor.fetchone()
+
+    # Update the user's profile with the new data
     user_profile.editUser(userId[0],userData)
 
+    # Redirect the user back to the dashboard after updating the profile
     return RedirectResponse(url="/dashboard", status_code=302)
 
 @app.get("/submit-interests")
 async def interests(request: Request):
+    # Render the interests submission page with a message
     return templates.TemplateResponse("interests.html", {"request": request, "message": "Select your interests"})
 
 @app.post("/submit-interests")
@@ -302,7 +332,8 @@ async def update_user_interests(
     request: Request,
     interests: List[str] = Form(...),
 ):
-
+    
+    # Get the first item in the list of interests (assuming a single string was submitted)
     interests = interests[0]
 
     # Split the string by commas
@@ -312,17 +343,22 @@ async def update_user_interests(
 
     user_profile = UserProfile()
 
+    # Prepare the user data dictionary with the updated interests
     userData = {
         'interests': interests
     }
 
+    # Retrieve the user's email from cookies
     email = request.cookies.get("email")
     conn = get_db_connection()
     cursor = conn.cursor()
+    # Fetch the user ID based on the email
     cursor.execute("SELECT id FROM users WHERE email = ?", (email,))
     userId = cursor.fetchone()
-    
+
+    # Update the user's profile with the new interests
     user_profile.editUser(userId[0],userData)
+    # Redirect the user back to the dashboard after updating interests
     return RedirectResponse(url="/dashboard", status_code=302)
 
 @app.post("/swipe")
@@ -331,9 +367,11 @@ async def handle_swipe(request: Request, direction: str = Body(...), email: str 
     userEmail = request.cookies.get("email")
     conn = get_db_connection()
     cursor = conn.cursor()
+    # Fetch the current user's ID based on their email
     cursor.execute("SELECT id FROM users WHERE email = ?", (userEmail,))
     userId = cursor.fetchone()
 
+    # Create an instance of UserInteraction to handle swipe interactions
     user_interaction = UserInteraction()
 
     if direction == "right":
@@ -357,23 +395,32 @@ async def handle_swipe(request: Request, direction: str = Body(...), email: str 
 
 @app.get("/matches")
 async def view_matches(request:Request):
+    # Retrieve the current user's email from cookies
     userEmail = request.cookies.get("email")
     conn = get_db_connection()
     cursor = conn.cursor()
+    # Fetch the current user's ID based on their email
     cursor.execute("SELECT id FROM users WHERE email = ?", (userEmail,))
     userId = cursor.fetchone()
+    # Fetch all matches for the current user
     all_matches = fetch_all_matches(userId[0],get_db_connection())
     print(all_matches)
 
+    # Render the matches page with the user's matches
     return templates.TemplateResponse("matches.html", {"all_matches":all_matches, "request": request, "message": "View your matches"})
 
 @app.post("/delete-profile")
 async def delete_user(request:Request):
+    # Create an instance of UserProfile to handle user profile interactions
     user_profile = UserProfile()
+    # Retrieve the current user's email from cookies
     userEmail = request.cookies.get("email")
     conn = get_db_connection()
     cursor = conn.cursor()
+    # Fetch the current user's ID based on their email
     cursor.execute("SELECT id FROM users WHERE email = ?", (userEmail,))
     userId = cursor.fetchone()
+    # Delete the user's profile from the database
     user_profile.deleteUser(userId[0])
+    # Redirect the user to the homepage after deleting their profile
     return RedirectResponse(url="/", status_code=302)
