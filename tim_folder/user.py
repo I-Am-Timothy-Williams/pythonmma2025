@@ -5,6 +5,7 @@ import json
 class UserProfile:
     @staticmethod
     def createUser(userData):
+        # Generate a new unique ID for the user
         newUser = {
                 'id': Identity.create_id(),
                 'firstName': userData.get('firstName'),
@@ -52,6 +53,7 @@ class UserProfile:
             newUser['password'],
         ))
 
+        # Commit the transaction and close the database connection
         conn.commit()
         conn.close()
 
@@ -69,9 +71,9 @@ class UserProfile:
             SELECT * FROM users WHERE id = ?
         ''', (userId,))
 
-        user = cursor.fetchone()
+        user = cursor.fetchone() # Fetch the user's data
 
-        conn.close()
+        conn.close() # Close the connection
 
         if user:
             # Convert the user information to a dictionary
@@ -95,6 +97,7 @@ class UserProfile:
         conn = sqlite3.connect('tinder.db')
         cursor = conn.cursor()
 
+        # Convert any lists in updateData to JSON strings
         updateData = {key: json.dumps(value) if isinstance(value, list) else value for key, value in updateData.items()}
 
         # Prepare SQL query and parameters for updating user info
