@@ -159,22 +159,31 @@ async def login(
     # Query to check if the user exists and the password matches
     cursor.execute("SELECT * FROM users WHERE email = ? AND password = ?", (email, password))
     user = cursor.fetchone()
+    # Query the database to check if the user has set their interests
     cursor.execute("SELECT interests FROM users WHERE email = ?", (email,))
     interest=cursor.fetchone()
     # print(interest[0]=="null")
     conn.close()
-
+    
+    # Check if the user exists (i.e., if the credentials were valid)
     if user:
-        success_message = urlencode({"message": "Login successful"})        
+        # Encode a success message
+        success_message = urlencode({"message": "Login successful"})
+        # Check if the user has already set their interests
         if interest[0] != "null":
+            # Redirect to the dashboard if interests are set
             response=RedirectResponse(url="/dashboard", status_code=302)
+            # Set a cookie with the user's email
             response.set_cookie(key="email", value=email)
             return response
         else:
+            # Redirect to the submit-interests page if interests are not set
             response=RedirectResponse(url="/submit-interests", status_code=302)
+            # Set a cookie with the user's email
             response.set_cookie(key="email",value=email)
             return response
     else:
+        # Raise an HTTP 401 Unauthorized error if the credentials are invalid
         raise HTTPException(status_code=401, detail="Invalid email or password")
 
 @app.get("/register")
