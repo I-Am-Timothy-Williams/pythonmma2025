@@ -73,7 +73,7 @@ def create_userMatches_table():
         user2Id TEXT NOT NULL,
         isMatch INT NOT NULL,
         dateCreated TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-        FOREIGN KEY (user1Id) REFERENCES users(id) ON DELETE CASCADE
+        FOREIGN KEY (user1Id) REFERENCES users(id) ON DELETE CASCADE,
         FOREIGN KEY (user2Id) REFERENCES users(id) ON DELETE CASCADE
     )
 ''')
