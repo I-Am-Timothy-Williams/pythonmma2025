@@ -26,6 +26,7 @@ def create_users_table():
     conn.close()
     return
 def create_userLikes_table():
+    # Connect to the database
     conn = sqlite3.connect('tinder.db')
     cursor = conn.cursor()
 
@@ -43,6 +44,7 @@ def create_userLikes_table():
     conn.close()
     return
 def create_userDislikes_table():
+    # Connect to the database
     conn = sqlite3.connect('tinder.db')
     cursor = conn.cursor()
 
