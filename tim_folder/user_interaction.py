@@ -96,7 +96,37 @@ class UserInteraction:
         return {'message': 'User disliked successfully'}
     @staticmethod
     def viewMatches(userId):
+        # Connect to the database
+        conn = sqlite3.connect('tinder.db')
+        cursor = conn.cursor()
+
+        # provide details of both persons that are matched
+        cursor.execute('''
+                SELECT 
+                    u1.id, u1.firstName, u1.lastName, u1.age, u1.gender,u1.location,u1.interests
+                    u2.id, u2.firstName, u2.lastName, u2.age, u2.gender,u2.location,u2.interests
+                FROM userMatches
+                JOIN users u1 ON userMatches.user1Id = u1.id
+                JOIN users u2 ON userMatches.user2Id = u2.id
+                WHERE (user1Id = ? OR user2Id = ?) AND isMatch = 1;
+            ''', (userId,userId))
+
+        # Fetch all matching rows
+        matches = cursor.fetchall()
+
+        # Print the matches
+        print(f"Confirmed matches for user ID {userId}:")
+        for match in matches:
+            # Check if userId is user1 or user2 and print the other user's information
+            if match[0] == userId:  # Alice is user1
+                print(
+                    f"Matched with: {match[8]} {match[9]} - Age: {match[10]}, Gender: {match[11]}, Location: {match[12]}, Interests: {match[13]}")
+            else:  # Alice is user2
+                print(
+                    f"Matched with: {match[1]} {match[2]} - Age: {match[3]}, Gender: {match[4]}, Location: {match[5]}, Interests: {match[6]}")
         return
+        # Close the connection
+        conn.close()
 
 
 # Example usage
