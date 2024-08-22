@@ -24,5 +24,16 @@ This repository contains a Python-based matching application that calculates and
 
 1. **Clone the repository:**
    ```bash
-   git clone https://github.com/your-username/matching-app.git
-   cd matching-app
+   git clone https://github.com/I-Am-Timothy-Williams/pythonmma2025.git
+2. **Install the Python packages using pip**
+   ```bash
+   pip install the required package
+
+ 
+## Usage
+1. **Input User Data: Enter user data when prompted by the application.**
+2. **Run Matching: The app calculates and identifies the best matches based on the similarity score.**
+3. **View Results: Matches are displayed in order of relevance.**
+4. !!!!! **Add more description use gif and pictiure to show how to use program**
+
+## 
