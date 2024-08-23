@@ -1,6 +1,7 @@
 import sqlite3
 from identity import Identity
 from user import UserProfile
+
 class UserInteraction:
     @staticmethod
     def likeUser(userId,likedUserId):
@@ -11,6 +12,7 @@ class UserInteraction:
         # Generate a unique ID for the like
         likeId = Identity.create_id()
 
+        # Fetch data to see if user already liked
         cursor.execute('''
         SELECT * FROM userLikes WHERE userId = ? AND userLikes = ?
 ''',(userId,likedUserId))
@@ -18,8 +20,8 @@ class UserInteraction:
         if user:
             print('hi im user', userId,likedUserId)
             return {'message': 'User already liked'}
-        print('hi')
-        # Insert the like information into the userLikes table
+        
+        # Insert the user and liked user information into the userLikes table
         cursor.execute('''
             INSERT INTO userLikes (id, userId, userLikes, dateCreated)
             VALUES (?, ?, ?, CURRENT_TIMESTAMP)
@@ -31,7 +33,8 @@ class UserInteraction:
 
         # Commit the transaction and close the connection
         conn.commit()
-        print('hi im user', userId,likedUserId  )
+
+        # Check to see if there is a match between user and liked user
         match = UserInteraction.checkMatches(userId, likedUserId, cursor)
         conn.close()
 
@@ -39,6 +42,7 @@ class UserInteraction:
             return {'message': 'It\'s a match!'}
         else:
             return {'message': 'User liked successfully'}
+        
     @staticmethod
     def checkMatches(userId, likedUserId, cursor):
         # Check if likedUserId has already liked userId
@@ -70,6 +74,7 @@ class UserInteraction:
                 return {'error': str(e)}
             return True
         return False
+    
     @staticmethod
     def dislikeUser(userId,dislikeduserId):
         # Connect to the database
@@ -94,13 +99,14 @@ class UserInteraction:
         conn.close()
 
         return {'message': 'User disliked successfully'}
+    
     @staticmethod
     def viewMatches(userId):
         # Connect to the database
         conn = sqlite3.connect('tinder.db')
         cursor = conn.cursor()
 
-        # provide details of both persons that are matched
+        # Check all rows where user is either user1 or user2 from the matchhes table
         cursor.execute('''
                 SELECT 
                     u1.id, u1.firstName, u1.lastName, u1.age, u1.gender,u1.location,u1.interests
@@ -118,21 +124,10 @@ class UserInteraction:
         print(f"Confirmed matches for user ID {userId}:")
         for match in matches:
             # Check if userId is user1 or user2 and print the other user's information
-            if match[0] == userId:  # Alice is user1
+            if match[0] == userId:  # User is user1
                 print(
                     f"Matched with: {match[8]} {match[9]} - Age: {match[10]}, Gender: {match[11]}, Location: {match[12]}, Interests: {match[13]}")
-            else:  # Alice is user2
+            else:  # User is user2
                 print(
                     f"Matched with: {match[1]} {match[2]} - Age: {match[3]}, Gender: {match[4]}, Location: {match[5]}, Interests: {match[6]}")
         return
-        # Close the connection
-        conn.close()
-
-
-# Example usage
-userId = '2c39c4521cd84465ae2c0bcc37efbe5a'  # Replace with the actual user ID
-likedUserId = '6bb138eebc284c989760eaf6cc4c4574'  # Replace with the ID of the liked user
-
-result = UserInteraction.likeUser(likedUserId, userId)
-# result = UserInteraction.dislikeUser(dislikedUserId,userId)
-print(result)  # Should print: {'message': 'User liked successfully'}
