@@ -166,7 +166,7 @@ The following packages are required for this project:
 After installation, you can start using the application with the following command:
 
 ```bash
-python main.py
+fastapi dev tim_folder/main.py        
 ```
 
 
