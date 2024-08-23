@@ -1,105 +1,7 @@
-<!-- <!DOCTYPE html>
-<html>
-  <head>
-    <title>Maps and Places Autocomplete</title>
-    <script>
-      async function init() {
-        await customElements.whenDefined('gmp-map');
-
-        const map = document.querySelector('gmp-map');
-        const marker = document.querySelector('gmp-advanced-marker');
-        const placePicker = document.querySelector('gmpx-place-picker');
-        const infowindow = new google.maps.InfoWindow();
-
-        map.innerMap.setOptions({
-          mapTypeControl: false
-        });
-
-        placePicker.addEventListener('gmpx-placechange', () => {
-          const place = placePicker.value;
-
-          if (!place.location) {
-            window.alert(
-              "No details available for input: '" + place.name + "'"
-            );
-            infowindow.close();
-            marker.position = null;
-            return;
-          }
-
-          if (place.viewport) {
-            map.innerMap.fitBounds(place.viewport);
-          } else {
-            map.center = place.location;
-            map.zoom = 17;
-          }
-
-          marker.position = place.location;
-          infowindow.setContent(
-            `<strong>${place.displayName}</strong><br>
-             <span>${place.formattedAddress}</span>`
-          );
-          infowindow.open(map.innerMap, marker);
-        });
-      }
-
-      document.addEventListener('DOMContentLoaded', init);
-    </script>
-    <script type="module" src="https://unpkg.com/@googlemaps/extended-component-library@0.6">
-    </script>
-    <style>
-      body {
-        margin: 0;
-        padding: 0;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        height: 100vh;
-        background-color: #f5f5f5;
-      }
-
-      .map-container {
-        width: 90%;
-        max-width: 800px;
-        height: 500px;
-        position: relative;
-        background-color: white;
-        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-        border-radius: 8px;
-        overflow: hidden;
-      }
-
-      .place-picker-container {
-        /* position: absolute;
-        top: 10px;
-        left: 10px;
-        z-index: 5;
-        background-color: white; */
-        padding: 8px;
-        /* border-radius: 4px;
-        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2); */
-      }
-    </style>
-  </head>
-  <body>
-    <div class="map-container">
-      <gmpx-api-loader key="AIzaSyD6lIlT_bAI-gwi4p1nd_o95SQX62S3hW8" solution-channel="GMP_GE_mapsandplacesautocomplete_v1">
-      </gmpx-api-loader>
-      <gmp-map center="40.749933,-73.98633" zoom="13" map-id="DEMO_MAP_ID">
-        <div slot="control-block-start-inline-start" class="place-picker-container">
-          <gmpx-place-picker placeholder="Enter an address"></gmpx-place-picker>
-        </div>
-        <gmp-advanced-marker></gmp-advanced-marker>
-      </gmp-map>
-    </div>
-  </body>
-</html> -->
-
-
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Maps and Places Autocomplete</title>
+  <title>Location Preference</title>
   <script>
     async function init() {
       await customElements.whenDefined('gmp-map');
@@ -109,9 +11,12 @@
       const placePicker = document.querySelector('gmpx-place-picker');
       const infowindow = new google.maps.InfoWindow();
       const radiusInput = document.getElementById('radius-input');
+
+      // Load preference from databasee
       let initRadius = {{preference}}
       const initialRadius = initRadius;
-      const initialPosition = { lat: {{lat}}, lng: {{lng}} }; // Preloaded marker location (example: New York)
+      // Load position from database
+      const initialPosition = { lat: {{lat}}, lng: {{lng}} }; 
 
 // Set the initial map center and marker position
 map.center = initialPosition;
@@ -122,7 +27,11 @@ infowindow.setContent(
   `<strong>Preloaded Location</strong><br>
    <span>New York, NY</span>`
 );
+
+
 infowindow.open(map.innerMap, marker);
+
+
 // Draw initial circle around the preloaded marker location
 const initialCircle = new google.maps.Circle({
   map: map.innerMap,
@@ -191,7 +100,7 @@ window.currentCircle = initialCircle;
           strokeWeight: 2,
         });
 
-        // Optionally clear previous circles
+        // Clear previous circles
         if (window.currentCircle) {
           window.currentCircle.setMap(null);
         }
@@ -264,14 +173,7 @@ window.currentCircle = initialCircle;
     }
 
     .place-picker-container {
-      /* position: absolute;
-      top: 10px;
-      left: 10px;
-      z-index: 5;
-      background-color: white; */
       padding: 8px;
-      /* border-radius: 4px;
-      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2); */
     }
   </style>
 </head>
