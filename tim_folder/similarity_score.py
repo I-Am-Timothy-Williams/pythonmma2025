@@ -4,6 +4,8 @@ import json
 import requests
 from sentence_transformers import SentenceTransformer, util
 import math
+
+# Initialize/load sentence transformer model
 model = SentenceTransformer('paraphrase-mpnet-base-v2')
 
 def haversine(lat1, lon1, lat2, lon2):
@@ -30,51 +32,38 @@ def haversine(lat1, lon1, lat2, lon2):
     return distance
 
 def get_lat_lng(location_name, api_key):
+    # Send geo location request to google api
     url = f"https://maps.googleapis.com/maps/api/geocode/json?address={location_name}&key={api_key}"
     response = requests.get(url)
     data = response.json()
 
+    # Format data into latitude and longitudinal points
     if 'results' in data and len(data['results']) > 0:
         lat_lng = data['results'][0]['geometry']['location']
         return lat_lng['lat'], lat_lng['lng']
     else:
         return None, None
-
-# def get_interests(db_name = 'tinder.db',user_id= None,min_age=None, max_age=None,valid_id=None):
-
-#     conn = sqlite3.connect(db_name)
-#     cursor = conn.cursor()
-
-#     try:
-#         print(min_age,max_age)
-#         cursor.execute("SELECT interests FROM users WHERE id != ? AND age between ? and ?", (user_id, min_age,max_age))
-#         rows = cursor.fetchall()
-#         interests = [row[0] for row in rows]
-#     except sqlite3.Error as e:
-#         print(f"Database error: {e}")
-#         interests = []
-#     finally:
-#         conn.close()
-
-#     return interests
+    
 def get_interests(db_name='tinder.db', valid_user_ids=None):
+    # If there are no valid users return an empty list
     if not valid_user_ids:
         return []
 
+    # Get database connection
     conn = sqlite3.connect(db_name)
     cursor = conn.cursor()
-
+    
+    # For each valid user, get their interests
     try:
-        # cursor.execute("SELECT interests FROM users WHERE id IN ({})".format(
-        #     ','.join('?' for _ in valid_user_ids)), valid_user_ids)
         cursor.execute("SELECT interests FROM users WHERE id IN ({})".format(
         ','.join('?' * len(valid_user_ids))
     ),
     valid_user_ids
-)#Potential issue of interests getting ordered inversely
+)       #Potential issue of interests getting ordered inversely
         rows = cursor.fetchall()
+
+        # We are only concerned about the interests from the rows, so that is what we are getting by taking row[0]
         interests = [row[0] for row in rows]
-        print(interests[0])
     except sqlite3.Error as e:
         print(f"Database error: {e}")
         interests = []
@@ -84,9 +73,12 @@ def get_interests(db_name='tinder.db', valid_user_ids=None):
     return interests
 
 def get_user_interests(db_name, user_id):
+
+    # Get database connectioin
     conn = sqlite3.connect(db_name)
     cursor = conn.cursor()
 
+    # Get interests where id is equal to the user's id from the user table. If there is nothing in the database for that user, user_interests is None
     try:
         cursor.execute("SELECT interests FROM users WHERE id = ?", (user_id,))
         row = cursor.fetchone()
@@ -105,69 +97,77 @@ def get_user_interests(db_name, user_id):
 
 
 def calculate_similarity(db_name='tinder.db',user_id = None,min_age=None,max_age=None):
-   
-    
-    conn = sqlite3.connect(db_name)
-    cursor = conn.cursor()
 
-
-    # cursor.execute("SELECT * FROM users WHERE id != ?",(user_id,))
-    # users = cursor.fetchall()
+    # Get users in age and location range
 
     users_in_range = get_users_in_age_range(db_name, user_id, min_age, max_age)
-    print(users_in_range)
+
+    # Turn into list of valid user ids
     valid_user_ids = [user for user in users_in_range]
 
+    # Check for valid user ids 
     if not valid_user_ids:
         print("No valid users found.")
         return []
 
+    # Get interests of valid users
     interests = get_interests(db_name, valid_user_ids)
+
+    # Check for valid user interests
     if not interests:
         print("No Interest Found")
         return
     
+    # Get user interests
     my_interests = get_user_interests(db_name, user_id)
 
+    # Check for user interests
     if not my_interests:
         print(f"No interests found for user_id {user_id}")
         return
     
+    # Convert user interests to list
     my_interests = [my_interests]
 
-    # Load Model
-
-    # Encode all interests
+    # Encode all interests / get vector embbeddings for user and valid user interests
     all_embeddings = model.encode(interests, convert_to_tensor=True)
     my_embedding = model.encode(my_interests, convert_to_tensor=True)
 
+    # Calculate cosine similarity of user vs valid user interests
     similarity_scores = util.pytorch_cos_sim(my_embedding, all_embeddings)
+
+    # Initialize user_scores list
     user_scores =[]
 
+    # Iterate through all users in range to append their similarity score to their id
     for i, user in enumerate(users_in_range):
-        # print(i,interests)
+        # If the user or valid users have no interests, score will automatically be 0
         if interests[i] == 'null' or my_interests[0] == 'null':
             score = 0.0
+        # Else the score will equal the cosine similarity score
         else:
-            score = similarity_scores[0][i].item()  # Comparing the specific user with others
+            score = similarity_scores[0][i].item() 
+
         user_scores.append((user, score))
-        # print(f"Similarity between 'User {user_id}' with interest {my_interests[0]} and User {i + 1} with interest {interests[i]}: {score}")
+
+    # Sort the order in which users show up to you based on their score
     user_scores.sort(key=lambda x: x[1], reverse=True)
     sorted_users = [user for user, score in user_scores]
-    print(sorted_users)
+
     return sorted_users
 
-
-        
         
 def get_distance_between_locations(location1, location2, api_key):
+    # Get lat and lng of user and valid user location
     lat1, lon1 = get_lat_lng(location1, api_key)
     lat2, lon2 = get_lat_lng(location2, api_key)
     
+    # Error message if none
     if lat1 is None or lat2 is None:
         print("Error: Unable to retrieve one or both locations' latitude and longitude.")
         return None
     
+    # Calculate distance using haversine formula
     return haversine(lat1, lon1, lat2, lon2)
     
 
@@ -175,28 +175,35 @@ def get_distance_between_locations(location1, location2, api_key):
 
 
 def get_users_in_age_range(db_name = 'tinder.db', user_id = None, min_age=None, max_age=None,api_key="AIzaSyD6lIlT_bAI-gwi4p1nd_o95SQX62S3hW8",max_distance=None):
+    # Get databasee connection
     conn = sqlite3.connect(db_name)
     cursor = conn.cursor()
 
+    # Search for users in between age range
     try:
         cursor.execute("""
             SELECT id,location
             FROM users 
             WHERE age BETWEEN ? AND ?
         """, (min_age, max_age))
-        print('hi')
+
+        # Store all valid users in rows
         rows = cursor.fetchall()
+        # If no valid users, return empty list
         if not rows:
             print(f"No users found in the age range {min_age} to {max_age}.")
             return []
+        
+        # Get user location andd location preference data
         cursor.execute("SELECT location FROM users WHERE id = ?", (user_id,))
         location = cursor.fetchone()
         cursor.execute("SELECT location_preference FROM users WHERE id = ?", (user_id,))
         max_distance = cursor.fetchone()
         
+        # Initialize final list of valid users
         result = []
         
-
+        # Filter users that pass age range out if they do not pass location preference test
 
         for row in rows:
             if row[0] == user_id:
