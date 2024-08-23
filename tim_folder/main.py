@@ -11,6 +11,7 @@ from urllib.parse import urlencode
 from typing import List
 import json
 from similarity_score import *
+import requests
 
 
 app = FastAPI()
@@ -24,13 +25,24 @@ def hash_password(password: str) -> str:
     # Hashing the password for comparison
     return hashlib.sha256(password.encode()).hexdigest()
 
+def get_lat_lng(location_name, api_key):
+    url = f"https://maps.googleapis.com/maps/api/geocode/json?address={location_name}&key={api_key}"
+    response = requests.get(url)
+    data = response.json()
+
+    if 'results' in data and len(data['results']) > 0:
+        lat_lng = data['results'][0]['geometry']['location']
+        return lat_lng['lat'], lat_lng['lng']
+    else:
+        return None, None
+
 class SwipeRequest(BaseModel):
     userId: str
     direction: str  # "left" or "right"
 
-def fetch_all_users(current_user_id, conn):
+def fetch_all_users(current_user_id, conn,min_age,max_age):
     cursor = conn.cursor()
-    cursor.execute("SELECT * FROM users")
+    cursor.execute("SELECT * FROM users WHERE age BETWEEN ? AND ?",(min_age,max_age))
     users = cursor.fetchall()
 
     all_users = []
@@ -173,17 +185,24 @@ async def dashboard(request: Request):
     cursor.execute("SELECT id FROM users WHERE email = ?", (email,))
     userId = cursor.fetchone()
     user_profile = UserProfile()
+    cursor.execute("SELECT min_age FROM users WHERE email = ?", (email,))
+    min_age = cursor.fetchone()
+    cursor.execute("SELECT max_age FROM users WHERE email = ?", (email,))
+    max_age = cursor.fetchone()
 
     user2 = user_profile.viewUser(userId[0])
 
-    all_users = fetch_all_users(userId[0],get_db_connection())
-    print(all_users)
+    # all_users = fetch_all_users(userId[0],get_db_connection(),min_age[0],max_age[0])
+    # print(all_users)
 
     all_matches = []
-    all_users2 = calculate_similarity(db_name='tinder.db', user_id=userId[0])
+    all_users2 = calculate_similarity(db_name='tinder.db', user_id=userId[0],min_age=min_age[0],max_age=max_age[0])
 
     for user in all_users2:
+        cursor.execute("SELECT * FROM users WHERE id = ?",(user,))
+        user=cursor.fetchone()
         interests_array = json.loads(user[8]) if isinstance(user[8], str) else user[8]
+
         if interests_array is None:
             interests_array = ["None"]
         all_matches.append({
@@ -195,8 +214,6 @@ async def dashboard(request: Request):
             "email": user[4],
             "interests": interests_array,
         })
-    print(all)
-
     return templates.TemplateResponse("dashboard.html", {"request": request,"all_users":all_matches, "user": user2, "message": "User logged in successfully"})
 @app.post("/dashboard")
 async def get_users(
@@ -319,3 +336,82 @@ async def delete_user(request:Request):
     userId = cursor.fetchone()
     user_profile.deleteUser(userId[0])
     return RedirectResponse(url="/", status_code=302)
+
+@app.get("/set-location-preference")
+async def set_location_preference(request: Request):
+    userEmail = request.cookies.get("email")
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    cursor.execute("SELECT location_preference FROM users WHERE email = ?", (userEmail,))
+    preference = cursor.fetchone()
+    cursor.execute("SELECT location FROM users WHERE email = ?", (userEmail,))
+    location = cursor.fetchone()
+
+     # Check if the preference is null and set it to 1 if so
+    if preference is None or preference[0] is None:
+        preference_value = 1
+    else:
+        preference_value = preference[0]
+
+    if location[0] is None:
+        location_name = "New York"  # Default to New York
+        lat, lng = get_lat_lng(location_name, "AIzaSyD6lIlT_bAI-gwi4p1nd_o95SQX62S3hW8")
+        if lat is None or lng is None:
+            lat, lng = 40.749933, -73.98633  # Default to New York
+    else:
+        lat, lng = get_lat_lng(location[0], "AIzaSyD6lIlT_bAI-gwi4p1nd_o95SQX62S3hW8")
+
+    return templates.TemplateResponse("location_preference.html", {"lat":lat,"lng":lng,"preference":preference_value,"request": request})
+
+@app.post("/set-location-preference")
+async def update_location_preference(
+    request: Request,
+    preferences: int = Form(..., alias='preferences'),
+):
+    print(preferences)
+    user_profile = UserProfile()
+    email = request.cookies.get("email")
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    cursor.execute("SELECT id FROM users WHERE email = ?", (email,))
+    userId = cursor.fetchone()
+
+    # Update the user's location preference in the database
+    location_preference_data = {
+        'location_preference': preferences
+    }
+
+    user_profile.editUser(userId[0], location_preference_data)
+    return RedirectResponse(url="/dashboard", status_code=302)
+
+@app.get("/set-age-preference")
+async def set_age_preference(request: Request):
+    return templates.TemplateResponse("age_preference.html", {"request": request})
+
+@app.post("/set-age-preference")
+async def update_age_preference(
+    request: Request,
+    min_age: int = Form(..., alias="minAge"),
+    max_age: int = Form(..., alias="maxAge"),
+):
+    # Debugging: Print the received values
+    print(f"Received min_age: {min_age}, max_age: {max_age}")
+    
+    user_profile = UserProfile()
+    email = request.cookies.get("email")
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    cursor.execute("SELECT id FROM users WHERE email = ?", (email,))
+    userId = cursor.fetchone()
+
+    # Update the user's age preference in the database
+    age_preference_data = {
+        'min_age': min_age,
+        'max_age': max_age
+    }
+
+    user_profile.editUser(userId[0], age_preference_data)
+
+    return RedirectResponse(url="/dashboard", status_code=302)
+
+
