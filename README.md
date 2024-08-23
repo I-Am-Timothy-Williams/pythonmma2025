@@ -8,15 +8,15 @@ This repository contains a Python-based matching application that calculates and
 - **`schema.py`**: Defines the schema for the data models.
 - **`similarity_score.py`**: Logic to calculate similarity scores between users.
 - **`user_interaction.py`**: Handles user interaction and input/output.
+- **`user.py`**: Manages user-related data and operations.
  
-
   ## Features
   Class UserInteraction Usage:
   - **`likeUser`**: Allow a user to like another user.
   - **`dislikeUser`**: Allow a user to dislike another user.
   - **`checkMatches`**: Check if the liked user also likes the user.
   - **`viewMatches`**: Select and display all matches for a user.
-  - **`user.py`**: Manages user-related data and operations.
+ 
     
   Class UserProfile Usage:
   - **`createUser`**: Create a new user profile.
