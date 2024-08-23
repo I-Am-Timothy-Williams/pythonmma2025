@@ -204,7 +204,13 @@
             <button id="edit-profile-button" class="btn btn-primary">Edit Profile</button>
             <form action="/delete-profile" method="POST" style="display: inline;">
                 <button type="submit" class="btn btn-primary" onclick="return confirm('Are you sure you want to delete your profile?');">Delete Profile</button>
-            </form> 
+            </form>
+            <form action="/set-age-preference" method="GET" style="display: inline;">
+                <button type="submit" class="btn btn-primary">Age Range</button>
+            </form>
+            <form action="/set-location-preference" method="GET" style="display: inline;">
+                <button type="submit" class="btn btn-primary">Location Range</button>
+            </form>   
         </div> 
         </div>
     </div>
@@ -295,8 +301,9 @@
                 handle() {
                     this.cards = this.board.querySelectorAll('.card');
                     this.topCard = this.cards[this.cards.length - 1];
-                    this.nextCard = this.cards[this.cards.length - 2];
-        
+                    // this.nextCard = this.cards[this.cards.length - 2];
+                    this.nextCard = this.cards.length > 1 ? this.cards[this.cards.length - 2] : null;
+
                     if (this.cards.length > 0) {
                         this.topCard.style.transform = 'translateX(-50%) translateY(-50%) rotate(0deg) rotateY(0deg) scale(1)';
         
@@ -425,10 +432,11 @@
                         if (!this.board.contains(this.noMoreMessage)) {
                             this.board.insertBefore(this.noMoreMessage, this.board.firstChild);
                         }
-                        this.currentIndex++;
+                        // this.currentIndex++;
+                    }
                     }
                 }
-            }
+            
         
             function capitalize(str) {
                 return str.charAt(0).toUpperCase() + str.slice(1);
