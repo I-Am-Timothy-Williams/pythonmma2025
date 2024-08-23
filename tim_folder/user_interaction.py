@@ -18,7 +18,6 @@ class UserInteraction:
 ''',(userId,likedUserId))
         user = cursor.fetchone()
         if user:
-            print('hi im user', userId,likedUserId)
             return {'message': 'User already liked'}
         
         # Insert the user and liked user information into the userLikes table
@@ -81,15 +80,25 @@ class UserInteraction:
         conn = sqlite3.connect('tinder.db')
         cursor = conn.cursor()
 
+        # Fetch data to see if user already disliked
+
+        cursor.execute('''
+        SELECT * FROM userLikes WHERE userId = ? AND userLikes = ?
+''',(userId,dislikeduserId))
+        user = cursor.fetchone()
+
+        if user:
+            return {'message': 'User already disliked'}
+        
         # Generate a unique ID for the like
-        likeId = Identity.create_id()
+        dislikeId = Identity.create_id()
 
         # Insert the like information into the userLikes table
         cursor.execute('''
             INSERT INTO userDislikes (id, userId, userDislikes, dateCreated)
             VALUES (?, ?, ?, CURRENT_TIMESTAMP)
         ''', (
-            likeId,       # Generated unique ID
+            dislikeId,       # Generated unique ID
             userId,       # The ID of the user who is disliking someone
             dislikeduserId   # The ID of the user who is being disliked
         ))
