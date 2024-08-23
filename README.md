@@ -167,7 +167,7 @@ After installation, you can start using the application with the following comma
 
 ```bash
 python main.py
-
+```
 
 
 ## Usage
