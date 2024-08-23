@@ -4,7 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Dashboard</title>
-    <!-- <link rel="stylesheet" href="tim_folder/static/styles.css">  -->
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -82,7 +81,7 @@
             display: flex;
             flex-direction: column;
         }
-        /* Edit Button Container */
+/* Edit Button Container */
 .edit-button-container {
     text-align: right;
     margin-top: 20px;
@@ -280,6 +279,7 @@
         <script src="https://cdnjs.cloudflare.com/ajax/libs/hammer.js/2.0.8/hammer.min.js"></script>
         <script>
             /* LikeCarousel (c) 2019 Simone P.M. github.com/simonepm - Licensed MIT */
+            /* Modified 2024 by Timothy Williams github.com/I-Am-Timothy-Williiams */
         
             class Carousel {
                 constructor(element, users) {
@@ -288,20 +288,17 @@
                     this.currentIndex = 0;
                     this.direction = "";
                     // Add the first two cards programmatically
-                    console.log(this.users[this.currentIndex]["email"], this.currentIndex)
                     this.push();
-                    console.log(this.users[this.currentIndex]["email"])
                     this.push();
         
                     // Handle gestures
                     this.handle();
                 }
                 
-
+                // Handle deals with initializing the card data
                 handle() {
                     this.cards = this.board.querySelectorAll('.card');
                     this.topCard = this.cards[this.cards.length - 1];
-                    // this.nextCard = this.cards[this.cards.length - 2];
                     this.nextCard = this.cards.length > 1 ? this.cards[this.cards.length - 2] : null;
 
                     if (this.cards.length > 0) {
@@ -317,7 +314,8 @@
                         this.hammer.on('pan', (e) => this.onPan(e));
                     }
                 }
-        
+                
+                // On Tap deals with what happens when you click a card
                 onTap(e) {
                     let propX = (e.center.x - e.target.getBoundingClientRect().left) / e.target.clientWidth;
                     let rotateY = 15 * (propX < 0.05 ? -1 : 1);
@@ -327,7 +325,8 @@
                         this.topCard.style.transform = 'translateX(-50%) translateY(-50%) rotate(0deg) rotateY(0deg) scale(1)';
                     }, 100);
                 }
-        
+
+                // On pan deals with what happens when you are dragging that card around
                 onPan(e) {
                     if (!this.isPanning) {
                         this.isPanning = true;
@@ -366,18 +365,16 @@
                         if (propX > 0.25 && e.direction == Hammer.DIRECTION_RIGHT) {
                             successful = true;
                             posX = this.board.clientWidth;
-                            // User liked the profile (Right swipe)
-                            console.log('hi');
+                            // User liked the profile (Right swipe)... store direction as right
                             
-                            // submitSwipe("right");
                             this.direction = "right";
 
 
                         } else if (propX < -0.25 && e.direction == Hammer.DIRECTION_LEFT) {
                             successful = true;
                             posX = -(this.board.clientWidth + this.topCard.clientWidth);
-                            // User disliked the profile (Left swipe)
-                            // submitSwipe("left");
+                            // User disliked the profile (Left swipe)... store direction as left
+
                             this.direction ="left";
 
                         } else if (propY < -0.25 && e.direction == Hammer.DIRECTION_UP) {
@@ -407,7 +404,7 @@
                         let card = document.createElement('div');
                         card.classList.add('card');
 
-
+                        // Controls the fact that cards show user data
         
                         card.innerHTML = `
                             <h3>${user.firstName} ${user.lastName}</h3>
@@ -420,6 +417,7 @@
         
                         this.board.insertBefore(card, this.board.firstChild);
                         this.currentIndex++;
+                        // If there are essentially no more users after this one, the next card shows a message saying "no more users for now!"
                     } else if (this.currentIndex >= this.users.length) {
                         if (!this.noMoreMessage) {
                             this.noMoreMessage = document.createElement('div');
@@ -432,7 +430,6 @@
                         if (!this.board.contains(this.noMoreMessage)) {
                             this.board.insertBefore(this.noMoreMessage, this.board.firstChild);
                         }
-                        // this.currentIndex++;
                     }
                     }
                 }
@@ -442,8 +439,7 @@
                 return str.charAt(0).toUpperCase() + str.slice(1);
             }
             function submitSwipe(direction,email) {
-                console.log('im submit swipe');                
-             // Example: POST request to FastAPI with user information and swipe direction
+             // Submit POST request witth swipe information stored earlier
             fetch("/swipe", {
                 method: "POST",
                 body: JSON.stringify({
@@ -464,7 +460,8 @@
     });
 }
 
-        
+            // Load all valid user information
+
             let users = {{ all_users | tojson | safe }};
         
             document.addEventListener('DOMContentLoaded', () => {
