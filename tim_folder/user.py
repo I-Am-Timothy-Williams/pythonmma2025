@@ -37,6 +37,7 @@ class UserProfile:
         # Convert interests list to a JSON string
         interests_json = json.dumps(newUser['interests'])
 
+        # Inserts stored user data into users table
         cursor.execute('''
             INSERT INTO users (id, firstName, middleName, lastName, email, age, gender, location, interests, password)
             VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
@@ -100,7 +101,7 @@ class UserProfile:
         # Convert any lists in updateData to JSON strings
         updateData = {key: json.dumps(value) if isinstance(value, list) else value for key, value in updateData.items()}
 
-        # Prepare SQL query and parameters for updating user info
+        # Prepare SQL query and parameters for updating user info. Set clause varies what sort of data we are trying to update based on the data we get
         set_clause = ', '.join(f"{key} = ?" for key in updateData.keys())
         sql_query = f'''
             UPDATE users
@@ -137,72 +138,3 @@ class UserProfile:
         conn.close()
 
         return {'message': 'User deleted successfully'}
-    # @staticmethod
-    # def sharedInterests(userId1, userId2):
-    #     # Connect to the database
-    #     conn = sqlite3.connect('tinder.db')
-    #     cursor = conn.cursor()
-
-    #     # Fetch interests for both users
-    #     cursor.execute('SELECT interests FROM users WHERE userId = ?', (userId1,))
-    #     user1_interests = cursor.fetchone()
-        
-    #     cursor.execute('SELECT interests FROM users WHERE userId = ?', (userId2,))
-    #     user2_interests = cursor.fetchone()
-
-    #     # Check if both users exist
-    #     if not user1_interests or not user2_interests:
-    #         conn.close()
-    #         return {'error': 'One or both users not found'}
-
-    #     # Convert JSON strings to Python lists
-    #     user1_interests = json.loads(user1_interests[0])
-    #     user2_interests = json.loads(user2_interests[0])
-
-    #     # Find the intersection (shared interests) between the two lists
-    #     shared_interests = set(user1_interests) & set(user2_interests)
-
-    #     # Close the database connection
-    #     conn.close()
-
-    #     # Return the count of shared interests
-    #     return {'sharedInterestsCount': len(shared_interests), 'sharedInterests': list(shared_interests)}
-
-
-
-#need to fetch userData from GUI
-userData = {
-    'firstName':'Jane',
-    'middleName': 'Q', 
-    'lastName': 'Doe',
-    'email': 'jane.doe@example.com',
-    'age': 28,
-    'gender': 'female',
-    'location': 'New York',
-    'interests': ['reading', 'traveling'],
-    'password': 'Welcome123!'
-}
-
-
-user_profile = UserProfile.createUser(userData)
-print(user_profile)
-user_info = UserProfile.viewUser('8b95686f518e4b458d4f6952c433434c')
-print(user_info)
-updateData = {
-    'firstName': 'Janecia',
-    'location': 'Los Angeles',
-    'email': 'janetjackson@gmail.com',
-    'interests': json.dumps(['hiking', 'photography'])  # Convert list to JSON string
-}
-
-# Attempt to update the user profile
-# result = UserProfile.editUser('8b95686f518e4b458d4f6952c433434c', updateData)
-# result = UserProfile.deleteUser('2da3f4f20daa4440a84bda8448b883b6')
-# print(result)  # Print the result message
-
-# Example usage
-userId1 = '8b95686f518e4b458d4f6952c433434c'  # Replace with actual user ID
-userId2 = 'dea9cfb0f7244677b6f06bdde6308639'  # Replace with actual user ID
-
-# result = UserProfile.sharedInterests(userId1, userId2)
-# print(result)
