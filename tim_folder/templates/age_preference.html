@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<!-- Coding By CodingNepal - youtube.com/codingnepal -->
+<!-- Modified By Timothy Williams - github.com/I-Am-Timothy-Williams-->
+<html lang="en" dir="ltr">
+  <head>
+    <meta charset="utf-8">  
+    <title>Age Preference Selection</title>
+    <link rel="stylesheet" href="/tim_folder/static/slider.css">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  </head>
+  <body>
+    <div class="wrapper">
+      <header>
+        <h2>Age Range</h2>
+        <p>Use slider or enter min and max age</p>
+      </header>
+      <form action="/set-age-preference" method="POST" style="display: inline;">
+      <div class="age-input">
+        <div class="field">
+          <span>Min</span>
+          <input type="number" name="minAge" class="input-min" value="30">
+        </div>
+        <div class="separator">-</div>
+        <div class="field">
+          <span>Max</span>
+          <input type="number" name="maxAge" class="input-max" value="55">
+        </div>
+      </div>       
+      <div class="edit-button-container" style="text-align: center; margin-top: 0px;">
+    <button type="submit" id="edit-profile-button" class="btn btn-primary">Save Preference</button>
+      </div>
+
+    </div>
+    </form>
+  </body>
+</html>

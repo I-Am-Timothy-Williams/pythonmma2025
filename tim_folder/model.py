@@ -1,15 +1,17 @@
 from sentence_transformers import SentenceTransformer, util
 
-
+# Load a pre-trained SentenceTransformer model
 model = SentenceTransformer('paraphrase-mpnet-base-v2')
 
+# List of job descriptions to compare
 job_descriptions = [
     "Software Engineer position with experience in Python and machine learning",
     "Data Scientist role involving analysis of large datasets using SQL and Python",
     "Product Manager position focusing on product development and market research"
 ]
 
-
+# Encode the job descriptions into embeddings (vector representations)
+# convert_to_tensor=True means the embeddings will be converted to PyTorch tensors
 embeddings = model.encode(job_descriptions, convert_to_tensor=True)
 
 # Calculate cosine similarity between each pair of job descriptions

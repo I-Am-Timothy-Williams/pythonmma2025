@@ -1,0 +1,54 @@
+<!-- <!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Chat App</title>
+    <link rel="stylesheet" href="tim_folder/static/matches.css" />
+  </head>
+  <body>
+
+    <div class="chat-container">
+      <h2 class="chat-header">Who's chatting...</h2>
+
+      <div class="chat-messages"></div>
+
+      <form class="chat-input-form">
+        <input type="text" class="chat-input" required placeholder="Type here, John..." />
+        <button type="submit" class="button send-button">Send</button>
+      </form>
+      <button class="button clear-chat-button">Clear Chat</button>
+    </div>
+
+    <script src="app.js"></script>
+  </body>
+</html> -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>View Matches</title>
+    <link rel="stylesheet" href="tim_folder/static/matches.css">
+</head>
+<body>
+    <header>
+        <h1>Your Matches</h1>
+    </header>
+    <div class="match-container">
+        {% for match in all_matches %}
+        <div class="match-card">
+            <img src="{{ match.get('profile_picture_url', 'tim_folder\static\cissy.jpeg') }}" alt="{{ match.get('firstName') }}">
+            <h3>{{ match.get('firstName') }} {{ match.get('lastName') }}</h3>
+            <p>Age: {{ match.get('age') }}</p>
+            <p>Location: {{ match.get('location') }}</p>
+            <p>Interests: 
+                {% for interest in match.get('interests', []) %}
+                    {{ interest.capitalize() }}{% if not loop.last %}, {% endif %}
+                {% endfor %}
+            </p>
+        </div>
+        {% endfor %}
+    </div>
+</body>
+</html>

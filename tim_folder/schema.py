@@ -26,6 +26,7 @@ def create_users_table():
     conn.close()
     return
 def create_userLikes_table():
+    # Connect to the database
     conn = sqlite3.connect('tinder.db')
     cursor = conn.cursor()
 
@@ -43,6 +44,7 @@ def create_userLikes_table():
     conn.close()
     return
 def create_userDislikes_table():
+    # Connect to the database
     conn = sqlite3.connect('tinder.db')
     cursor = conn.cursor()
 
@@ -62,10 +64,11 @@ def create_userDislikes_table():
     conn.close()
     return
 def create_userMatches_table():
+    # Connect to the database
     conn = sqlite3.connect('tinder.db')
     cursor = conn.cursor()
 
-    # Create the userDislikes table
+    # Create the userMatches table
     cursor.execute('''
     CREATE TABLE IF NOT EXISTS userMatches(
         id TEXT PRIMARY KEY NOT NULL,
@@ -73,7 +76,8 @@ def create_userMatches_table():
         user2Id TEXT NOT NULL,
         isMatch INT NOT NULL,
         dateCreated TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-        FOREIGN KEY (user1Id) REFERENCES users(id) ON DELETE CASCADE
+        FOREIGN KEY (user1Id) REFERENCES users(id) ON DELETE CASCADE,
+        FOREIGN KEY (user2Id) REFERENCES users(id) ON DELETE CASCADE
     )
 ''')
 
