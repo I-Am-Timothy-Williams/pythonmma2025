@@ -17,7 +17,8 @@ import requests
 app = FastAPI()
 
 def get_db_connection():
-    conn = sqlite3.connect('tinder.db')  # Update with your database file
+    # Establish database connection
+    conn = sqlite3.connect('tinder.db') 
     conn.row_factory = sqlite3.Row    
     return conn
 
@@ -26,9 +27,12 @@ def hash_password(password: str) -> str:
     return hashlib.sha256(password.encode()).hexdigest()
 
 def get_lat_lng(location_name, api_key):
+    # Send geo location request to google api
     url = f"https://maps.googleapis.com/maps/api/geocode/json?address={location_name}&key={api_key}"
     response = requests.get(url)
     data = response.json()
+
+    # Format data into latitude and longitudinal points
 
     if 'results' in data and len(data['results']) > 0:
         lat_lng = data['results'][0]['geometry']['location']
@@ -37,39 +41,17 @@ def get_lat_lng(location_name, api_key):
         return None, None
 
 class SwipeRequest(BaseModel):
+    # Use Pydantic Model to fetch swipe data from dashboard.html
     userId: str
     direction: str  # "left" or "right"
 
-def fetch_all_users(current_user_id, conn,min_age,max_age):
-    cursor = conn.cursor()
-    cursor.execute("SELECT * FROM users WHERE age BETWEEN ? AND ?",(min_age,max_age))
-    users = cursor.fetchall()
-
-    all_users = []
-    for user in users:
-        if user['id'] == current_user_id:
-            continue  # Skip the current user's row
-
-        interests_array = json.loads(user['interests']) if isinstance(user['interests'], str) else user['interests']
-        if interests_array is None:
-            interests_array = ["None"]
-        
-        all_users.append({
-            "firstName": user['firstName'],
-            "lastName": user['lastName'],
-            "gender": user['gender'],
-            "age": user['age'],
-            "location": user['location'],
-            "email": user['email'],
-            "interests": interests_array,
-        })
-    return all_users
-
 def fetch_all_matches(current_user_id, conn):
+    #Fetch all users from userMatches table
     cursor = conn.cursor()
     cursor.execute("SELECT * FROM userMatches")
     users = cursor.fetchall()
 
+    #Include only rows with user id in it
     all_matches = []
     for user in users:
         if user['user1Id'] != current_user_id:
@@ -77,6 +59,7 @@ def fetch_all_matches(current_user_id, conn):
                 continue  # Skip the current user's row
 
         
+        #Fetch the matched user id
 
         if user['user1Id'] == current_user_id:
             cursor.execute("SELECT * FROM users WHERE id = ?",(user['user2Id'],))
@@ -84,6 +67,8 @@ def fetch_all_matches(current_user_id, conn):
         else:
             cursor.execute("SELECT * FROM users WHERE id = ?",(user['user1Id'],))
             match = cursor.fetchone()
+
+        #Fetch matched user interests
         
         interests_array = json.loads(match['interests']) if isinstance(match['interests'], str) else match['interests']
         if interests_array is None:
@@ -108,25 +93,56 @@ app.mount("/tim_folder/static", StaticFiles(directory="tim_folder/static"), name
 # Setup Jinja2 template engine
 templates = Jinja2Templates(directory="tim_folder/templates")
 
+
+"""
+For our GUI we are hosting a website on our local machine using FastAPI as a framework. 
+We interact with various pages using GET and POST requests. The page that is being interacted with is what is enclosed 
+in the brackets. E.g. app.get('/dashboard') is handling the GET requests that are being sent to 127.0.0.1:8000/dashboard
+
+GET Requests
+Purpose: Used to retrieve data from the server.
+
+How It Works:
+
+The client sends a GET request to a specified endpoint (URL).
+The server processes the request and returns the requested data.
+Typically, GET requests do not modify any data on the server; they are read-only.
+
+POST Requests
+Purpose: Used to send data to the server, often for creating or updating resources.
+
+How It Works:
+
+The client sends a POST request to the server, usually with data in the body of the request.
+The server processes the data and performs some action, like saving the data to a database.
+The server then typically returns a response indicating the success or failure of the operation.
+"""
+
+
 @app.get("/")
 def read_root(request: Request):
+     # Renders the login/index page when a GET request is made to "/"
     return templates.TemplateResponse("index.html", {"request": request})
+
 @app.post("/")
 async def login(
     email: str = Form(...),
     password: str = Form(...)
 ):
+    # Get database connection
     conn = get_db_connection()
     cursor = conn.cursor()
 
     # Query to check if the user exists and the password matches
     cursor.execute("SELECT * FROM users WHERE email = ? AND password = ?", (email, password))
     user = cursor.fetchone()
+
+    # Fetch interests from user
     cursor.execute("SELECT interests FROM users WHERE email = ?", (email,))
     interest=cursor.fetchone()
-    # print(interest[0]=="null")
     conn.close()
-
+    
+    #Error Handling for incorrect information
     if user:
         success_message = urlencode({"message": "Login successful"})        
         if interest[0] != "null":
@@ -142,6 +158,7 @@ async def login(
 
 @app.get("/register")
 def read_root(request: Request):
+    # Renders the registration page when a GET request is made to "/register"
     return templates.TemplateResponse("register.html", {"request": request})
 
 @app.post("/register")
@@ -157,6 +174,11 @@ async def register_user(
     password: str = Form(...),
     interests: str = Form(None)
 ):
+    """
+    Handles user registration by accepting form data, creating a new user profile, 
+    and storing the user information in the database.
+    """
+
     # Create an instance of your UserProfile class
     user_profile = UserProfile()
 
@@ -179,9 +201,11 @@ async def register_user(
 
 @app.get("/dashboard")
 async def dashboard(request: Request):
+    # Retrieve user email from cookies and get profile information from database
     email = request.cookies.get("email")
     conn = get_db_connection()
     cursor = conn.cursor()
+    # Fetch user id, min and max age requirements
     cursor.execute("SELECT id FROM users WHERE email = ?", (email,))
     userId = cursor.fetchone()
     user_profile = UserProfile()
@@ -190,15 +214,16 @@ async def dashboard(request: Request):
     cursor.execute("SELECT max_age FROM users WHERE email = ?", (email,))
     max_age = cursor.fetchone()
 
-    user2 = user_profile.viewUser(userId[0])
-
-    # all_users = fetch_all_users(userId[0],get_db_connection(),min_age[0],max_age[0])
-    # print(all_users)
+    # Fetch user information
+    my_user = user_profile.viewUser(userId[0])
 
     all_matches = []
-    all_users2 = calculate_similarity(db_name='tinder.db', user_id=userId[0],min_age=min_age[0],max_age=max_age[0])
 
-    for user in all_users2:
+    # Fetch all users that fit within age and location restraints
+    all_users = calculate_similarity(db_name='tinder.db', user_id=userId[0],min_age=min_age[0],max_age=max_age[0])
+
+    # For each valid user, store their information in a list
+    for user in all_users:
         cursor.execute("SELECT * FROM users WHERE id = ?",(user,))
         user=cursor.fetchone()
         interests_array = json.loads(user[8]) if isinstance(user[8], str) else user[8]
@@ -214,7 +239,7 @@ async def dashboard(request: Request):
             "email": user[4],
             "interests": interests_array,
         })
-    return templates.TemplateResponse("dashboard.html", {"request": request,"all_users":all_matches, "user": user2, "message": "User logged in successfully"})
+    return templates.TemplateResponse("dashboard.html", {"request": request,"all_users":all_matches, "user": my_user, "message": "User logged in successfully"})
 @app.post("/dashboard")
 async def get_users(
     request: Request,
@@ -231,7 +256,7 @@ async def get_users(
     interests_list = [interest.strip() for interest in interests.split(',')]
     interests_json = json.dumps(interests_list)
 
-    # Call the create_user_profile method with the form data
+    # Call the edit_user_profile method with the form data
     userData = {
     'firstName':firstName,
     'middleName': None, 
@@ -254,6 +279,7 @@ async def get_users(
 
 @app.get("/submit-interests")
 async def interests(request: Request):
+    # Visualize interests.html
     return templates.TemplateResponse("interests.html", {"request": request, "message": "Select your interests"})
 
 @app.post("/submit-interests")
@@ -262,12 +288,11 @@ async def update_user_interests(
     interests: List[str] = Form(...),
 ):
 
+
+    # Fetch and store interests as a list of interests which updates the user profile usingi edit_user_profile function
     interests = interests[0]
 
-    # Split the string by commas
     interests = interests.split(',')
-    print(interests)
-
 
     user_profile = UserProfile()
 
@@ -282,11 +307,14 @@ async def update_user_interests(
     userId = cursor.fetchone()
     
     user_profile.editUser(userId[0],userData)
+    # Redirect user to dashboard once interests are submitted
     return RedirectResponse(url="/dashboard", status_code=302)
 
 @app.post("/swipe")
 async def handle_swipe(request: Request, direction: str = Body(...), email: str = Body(...)):
-    # Handle the swipe logic (e.g., save to database)
+
+    # Fetch my user id
+
     userEmail = request.cookies.get("email")
     conn = get_db_connection()
     cursor = conn.cursor()
@@ -295,18 +323,20 @@ async def handle_swipe(request: Request, direction: str = Body(...), email: str 
 
     user_interaction = UserInteraction()
 
+    # Handle the swipe logic
+
     if direction == "right":
-        # Handle like logic
-        print(direction,email)
+        # Handle like logic (calls the like_user user_interaction function)
         cursor = conn.cursor()
+        # Fetch the liked user
         cursor.execute("SELECT id FROM users WHERE email = ?", (email,))
         likedUserId = cursor.fetchone()
         user_interaction.likeUser(userId[0],likedUserId[0])
 
     elif direction == "left":
-        # Handle dislike logic
-        print(direction,email)
+        # Handle dislike logic (calls the dislike_user user_interaction function)
         cursor = conn.cursor()
+        # Fetch the disliked user
         cursor.execute("SELECT id FROM users WHERE email = ?", (email,))
         dislikedUserId = cursor.fetchone()
         user_interaction.dislikeUser(userId[0],dislikedUserId[0])
@@ -316,29 +346,41 @@ async def handle_swipe(request: Request, direction: str = Body(...), email: str 
 
 @app.get("/matches")
 async def view_matches(request:Request):
+
+    # Fetch user id
     userEmail = request.cookies.get("email")
     conn = get_db_connection()
     cursor = conn.cursor()
     cursor.execute("SELECT id FROM users WHERE email = ?", (userEmail,))
     userId = cursor.fetchone()
+
+    # Get all match data to send to matches.html template to display
     all_matches = fetch_all_matches(userId[0],get_db_connection())
-    print(all_matches)
 
     return templates.TemplateResponse("matches.html", {"all_matches":all_matches, "request": request, "message": "View your matches"})
 
 @app.post("/delete-profile")
 async def delete_user(request:Request):
+
     user_profile = UserProfile()
+
+    # Fetch user id
     userEmail = request.cookies.get("email")
     conn = get_db_connection()
     cursor = conn.cursor()
     cursor.execute("SELECT id FROM users WHERE email = ?", (userEmail,))
     userId = cursor.fetchone()
+
+    # Delete user profile using delete_user_profile function
     user_profile.deleteUser(userId[0])
+
+    # Redirect you to login page
     return RedirectResponse(url="/", status_code=302)
 
 @app.get("/set-location-preference")
 async def set_location_preference(request: Request):
+
+    # Fetch user email to retrieve location and location preference information
     userEmail = request.cookies.get("email")
     conn = get_db_connection()
     cursor = conn.cursor()
@@ -347,18 +389,21 @@ async def set_location_preference(request: Request):
     cursor.execute("SELECT location FROM users WHERE email = ?", (userEmail,))
     location = cursor.fetchone()
 
-     # Check if the preference is null and set it to 1 if so
+    # Check if the preference is null and set it to 1 if so (Essentially default value is 1 km), Otherwise it uses value from database.
     if preference is None or preference[0] is None:
         preference_value = 1
     else:
         preference_value = preference[0]
 
+    # If you have no location set, default location is New York
     if location[0] is None:
         location_name = "New York"  # Default to New York
         lat, lng = get_lat_lng(location_name, "AIzaSyD6lIlT_bAI-gwi4p1nd_o95SQX62S3hW8")
+        # If for whatever reason you cannot retrieve lat, lng, default to New York lat and lng.
         if lat is None or lng is None:
             lat, lng = 40.749933, -73.98633  # Default to New York
     else:
+    # Else find lat and lng from location from the database
         lat, lng = get_lat_lng(location[0], "AIzaSyD6lIlT_bAI-gwi4p1nd_o95SQX62S3hW8")
 
     return templates.TemplateResponse("location_preference.html", {"lat":lat,"lng":lng,"preference":preference_value,"request": request})
@@ -368,24 +413,27 @@ async def update_location_preference(
     request: Request,
     preferences: int = Form(..., alias='preferences'),
 ):
-    print(preferences)
     user_profile = UserProfile()
+
+    # Fetch user id
     email = request.cookies.get("email")
     conn = get_db_connection()
     cursor = conn.cursor()
     cursor.execute("SELECT id FROM users WHERE email = ?", (email,))
     userId = cursor.fetchone()
 
-    # Update the user's location preference in the database
+    # Update the user's location preference in the database using edit_user_profile function
     location_preference_data = {
         'location_preference': preferences
     }
 
     user_profile.editUser(userId[0], location_preference_data)
+    # Redirect to dashboard once preferences are submitted
     return RedirectResponse(url="/dashboard", status_code=302)
 
 @app.get("/set-age-preference")
 async def set_age_preference(request: Request):
+    # Visualize age preference picker (age_preference.html)
     return templates.TemplateResponse("age_preference.html", {"request": request})
 
 @app.post("/set-age-preference")
@@ -394,24 +442,23 @@ async def update_age_preference(
     min_age: int = Form(..., alias="minAge"),
     max_age: int = Form(..., alias="maxAge"),
 ):
-    # Debugging: Print the received values
-    print(f"Received min_age: {min_age}, max_age: {max_age}")
-    
     user_profile = UserProfile()
+
+    # Fetch user id
     email = request.cookies.get("email")
     conn = get_db_connection()
     cursor = conn.cursor()
     cursor.execute("SELECT id FROM users WHERE email = ?", (email,))
     userId = cursor.fetchone()
 
-    # Update the user's age preference in the database
+    # Update the user's age preference in the database using the edit_user_profile function
     age_preference_data = {
         'min_age': min_age,
         'max_age': max_age
     }
 
     user_profile.editUser(userId[0], age_preference_data)
-
+    # Redirect to dashboard once preferences are submitted
     return RedirectResponse(url="/dashboard", status_code=302)
 
 
