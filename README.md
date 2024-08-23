@@ -41,38 +41,133 @@ This repository contains a Python-based matching application that calculates and
 
 
 ## Features
+### 1. User Profile Management
 
-Class UserInteraction Usage: \
-    -**`likeUser`**: Allow a user to like another user. \
-                                                  -**`dislikeUser`**: Allow a user to dislike another user. \
-                                                                                                      -**`checkMatches`**: Check if the liked user also likes the user. \
-                                                                                                                                                                  -**`viewMatches`**: Select and display all matches for a user.
+- **Profile Attributes:**
+  - Each user profile contains the following attributes:
+    - `user_id` (unique identifier)
+    - `name`
+    - `age`
+    - `gender`
+    - `location`
+    - `interests` (list of interests)
 
-Class UserProfile Usage: \
-    -**`createUser`**: Create a new user profile. \
-                                         -**`viewUser`**: Select user's info of a user.\
-  -**`editUser`**: Update user profile infor.\
-  -**`deleteUser`**: Remove a user profile.
+- **Profile Actions:**
+  - **Create a new user profile**
+  - **View existing user profiles**
+  - **Edit user profile details**
+  - **Delete user profile**
+
+### 2. User Interaction
+
+- **Interaction Attributes:**
+  - Tracks user interactions with the following attributes:
+    - `liked_users` (list of user IDs that the user has liked)
+    - `disliked_users` (list of user IDs that the user has disliked)
+    - `matches` (list of user IDs that are mutual likes, based on a sophisticated matching algorithm)
+
+- **Interaction Actions:**
+  - **Like a user profile**
+  - **Dislike a user profile**
+  - **View matches** (based on user interactions, remembers likes and dislikes)
+
+### 3. Data Storage and Management
+
+- **Data Structures:**
+  - Utilizes Python lists, tuples, and dictionaries to manage user profiles and interactions.
+
+- **Database Integration:**
+  - Implements a SQLite database to store user profiles and interactions.
+  - Performs CRUD operations (Create, Read, Update, Delete) using SQL queries.
+  - Uses the `sqlite3` library for database interactions.
+ 
+### 4. Graphic User Interface (GUI)
+
+- **User Commands:**
+  - `create_user`: Create a new user profile
+  - `view_profiles`: View all user profiles
+  - `edit_profile`: Edit an existing user profile
+  - `delete_profile`: Delete a user profile
+  - `like_user`: Like a user profile
+  - `dislike_user`: Dislike a user profile
+  - `view_matches`: View matched user profiles
 
 ## Getting Started
 
 ### Prerequisites
 
-- Python 3.7 or higher
-- Pycharm
+This project requires Python 3.7 or higher and the following Python packages:
+
+- PyCharm
 - SQLite3
 - NumPy
 - Pandas
+- Sentence Transformers
+- Identity
+- FastAPI
+- Pydantic
 
 ### Installation
 
 1. **Clone the repository:**
+
+    ```bash
+    git clone https://github.com/I-Am-Timothy-Williams/pythonmma2025.git
+    cd pythonmma2025
+    ```
+
+2. **Create a virtual environment:**
+
+    ```bash
+    python3 -m venv venv
+    ```
+
+3. **Activate the virtual environment:**
+
+    - On macOS/Linux:
+
+        ```bash
+        source venv/bin/activate
+        ```
+
+    - On Windows:
+
+        ```bash
+        venv\Scripts\activate
+        ```
+
+4. **Install the dependencies:**
+
+    Make sure you have `pip` updated:
+
+    ```bash
+    pip install --upgrade pip
+    ```
+
+    Install the required packages using the `requirements.txt` file:
+
+    ```bash
+    pip install -r requirements.txt
+    ```
+
+### Dependencies
+
+The following packages are required for this project:
+
+- `numpy`
+- `pandas`
+- `sentence-transformers`
+- `identity`
+- `fastapi`
+- `pydantic`
+
+### Running the Application
+
+After installation, you can start using the application with the following command:
+
 ```bash
-git clone https://github.com/I-Am-Timothy-Williams/pythonmma2025.git
-2. **Install the Python packages using pip**
-```bash
-pip install the required package
-3.
+python main.py
+
 
 
 ## Usage
@@ -80,8 +175,6 @@ pip install the required package
 2. **Run Matching: The app calculates and identifies the best matches based on the similarity score.**
 3. **View Results: Matches are displayed in order of relevance.**
 4. !!!!! **Add more description use gif and pictiure to show how to use program**
-
-##
 
 
 
