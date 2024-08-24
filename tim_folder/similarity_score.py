@@ -186,7 +186,7 @@ def get_distance_between_locations(location1, location2, api_key):
 
 
 
-def get_users_in_age_range(db_name = 'tinder.db', user_id = None, min_age=None, max_age=None,api_key="AIzaSyD6lIlT_bAI-gwi4p1nd_o95SQX62S3hW8",max_distance=None):
+def get_users_in_age_range(db_name = 'tinder.db', user_id = None, min_age=None, max_age=None,api_key="api_key",max_distance=None):
     # Get databasee connection
     conn = sqlite3.connect(db_name)
     cursor = conn.cursor()
