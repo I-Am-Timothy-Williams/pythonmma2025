@@ -404,13 +404,13 @@ async def set_location_preference(request: Request):
     # If you have no location set, default location is New York
     if location[0] is None:
         location_name = "New York"  # Default to New York
-        lat, lng = get_lat_lng(location_name, "AIzaSyD6lIlT_bAI-gwi4p1nd_o95SQX62S3hW8")
+        lat, lng = get_lat_lng(location_name, "api_key")
         # If for whatever reason you cannot retrieve lat, lng, default to New York lat and lng.
         if lat is None or lng is None:
             lat, lng = 40.749933, -73.98633  # Default to New York
     else:
     # Else find lat and lng from location from the database
-        lat, lng = get_lat_lng(location[0], "AIzaSyD6lIlT_bAI-gwi4p1nd_o95SQX62S3hW8")
+        lat, lng = get_lat_lng(location[0], "api_key")
 
     return templates.TemplateResponse("location_preference.html", {"lat":lat,"lng":lng,"preference":preference_value,"request": request})
 
