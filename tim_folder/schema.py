@@ -17,7 +17,11 @@ def create_users_table():
             gender TEXT,
             location TEXT,
             interests TEXT,
-            password TEXT
+            password TEXT,
+            min_age INT,
+            max_age INT,
+            location_preference INT,
+            image_path TEXT
         )
     ''')
 
@@ -89,3 +93,5 @@ create_users_table()
 create_userLikes_table()
 create_userDislikes_table()
 create_userMatches_table()
+
+
