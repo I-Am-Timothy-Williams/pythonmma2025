@@ -257,6 +257,8 @@ The **Location Range** setting allows you to edit the maximum reach of the geogr
 
 </div>
 
+## PLEASE ENTER IN BOTH PREFERENCES TO GET STARTED WITH THE MATCHING PROCESS
+
 ### Dashboard - Profile Matching
 
 The bottom section of the **Dashboard** displays profiles that are matched and pushed to you based on your personal data. The app calculates and identifies the best matches using a similarity score derived from your interests and those of other users.
