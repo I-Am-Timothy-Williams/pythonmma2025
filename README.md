@@ -109,7 +109,7 @@ This project requires Python 3.7 or higher and the following Python packages:
 
 ### Installation
 
-1. **Clone the repository:**
+1. **Clone the repository: (PLEASE USE THE MASTER BRANCH) **
 
     ```bash
     git clone https://github.com/I-Am-Timothy-Williams/pythonmma2025.git
