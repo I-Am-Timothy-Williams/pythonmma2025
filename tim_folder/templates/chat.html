@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chat with {{ name }}</title>
+    <link rel="stylesheet" href="tim_folder/static/chat.css">
+</head>
+<body>
+    <header>
+        <h1>Chat with {{ name }}</h1>
+    </header>
+    <div class="chat-container">
+        <!-- Display chat messages here -->
+        <div class="chat-container">
+            <div class="messages">
+                {% for message in chat_history %}
+                    <div class="message">
+                        <p><strong>{{ message['sender_name'] }} sent at {{ message['timestamp'] }}</strong>: {{ message['message'] }}</p>
+                    </div>
+                {% endfor %}
+            </div>
+        <form action="/send_message" method="post">
+            <input type="hidden" name="sender_id" value="{{ user_email }}">
+            <input type="hidden" name="receiver_id" value="{{ name }}">
+            <input type="text" name="message" placeholder="Type a message..." required>
+            <button type="submit">Send</button>
+        </form>
+    </div>
+</body>
+</html>
