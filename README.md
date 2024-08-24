@@ -1,4 +1,5 @@
-# Tinder,But Better
+# Tinder,But Better 
+## (Please look at submission comments for API key (variable used in main.py and similarity_score.py))
 This repository contains a Python-based matching application that calculates and displays user matches based on similarity scores. The app is modular, with separate files for data models, schemas, similarity score calculations, and user interactions.
 
 ## Project Structure
@@ -196,7 +197,7 @@ To register, enter the following details:
 - **Email** (used for identification if no username is set)
 - **Age** (an integer)
 - **Gender** (choose between "male"/"female")
-- **Location** (address can be entered to improve matching accuracy, or you can enter general city/country for privacy purposes)
+- **Location** (address can be entered to improve matching accuracy, or you can enter general city/country for privacy purposes the program will pretty much accept anything as long as google maps can recognize the place)
 - **Username** (required for login)
 - **Password** (required for login)
 
@@ -257,7 +258,7 @@ The **Location Range** setting allows you to edit the maximum reach of the geogr
 
 </div>
 
-## PLEASE ENTER IN BOTH PREFERENCES TO GET STARTED WITH THE MATCHING PROCESS
+## PLEASE ENTER IN BOTH THE LOCATION AND AGE PREFERENCES TO GET STARTED WITH THE MATCHING PROCESS
 
 ### Dashboard - Profile Matching
 
