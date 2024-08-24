@@ -197,7 +197,7 @@ To register, enter the following details:
 - **Email** (used for identification if no username is set)
 - **Age** (an integer)
 - **Gender** (choose between "male"/"female")
-- **Location** (address can be entered to improve matching accuracy, or you can enter general city/country for privacy purposes)
+- **Location** (address can be entered to improve matching accuracy, or you can enter general city/country for privacy purposes the program will pretty much accept anything as long as google maps can recognize the place)
 - **Username** (required for login)
 - **Password** (required for login)
 
