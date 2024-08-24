@@ -229,6 +229,13 @@ After making changes, click **Save Changes** to store your updates and return to
 
 </div>
 
+You will also have the option to **upload a profile image**. You can save the image by clicking the submit button.
+
+<div align="center">
+    <img width="489" alt="Screenshot 2024-08-23 at 9 12 17 PM" src="https://i.imgur.com/u3riXTR.png">
+
+</div>
+
 ### Delete Profile
 
 The **Delete Profile** button will prompt you with a confirmation pop-up. If you agree to the prompt, your profile information will be permanently deleted from the database. You will then be immediately logged out and redirected to the login page.
