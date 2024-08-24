@@ -97,9 +97,9 @@ def create_userChat():
     # Create the userChat table
     cursor.execute('''
     CREATE TABLE IF NOT EXISTS userChat(
-    id INTEGER PRIMARY KEY AUTOINCREMENT,  -- Unique identifier for each message
-    sender_id INTEGER NOT NULL,           -- ID of the user who sent the message
-    receiver_id INTEGER NOT NULL,         -- ID of the user who receives the message
+    id TEXT PRIMARY KEY,  -- Unique identifier for each message
+    sender_id TEXT NOT NULL,           -- ID of the user who sent the message
+    receiver_id TEXT NOT NULL,         -- ID of the user who receives the message
     message TEXT NOT NULL,                -- Content of the message
     timestamp DATETIME DEFAULT CURRENT_TIMESTAMP, -- Time when the message was sent
     FOREIGN KEY (sender_id) REFERENCES users(id),  -- Reference to the users table
