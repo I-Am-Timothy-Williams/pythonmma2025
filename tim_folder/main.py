@@ -1,4 +1,4 @@
-from fastapi import FastAPI, Request, Form, HTTPException, Body
+from fastapi import FastAPI, Request, Form, HTTPException, Body, UploadFile, File
 from fastapi.responses import RedirectResponse, HTMLResponse
 from fastapi.templating import Jinja2Templates
 from fastapi.staticfiles import StaticFiles
@@ -11,10 +11,14 @@ from urllib.parse import urlencode
 from typing import List
 import json
 from similarity_score import *
+import os
 import requests
 
 
 app = FastAPI()
+
+UPLOAD_DIRECTORY = "tim_folder/static"
+
 
 def get_db_connection():
     # Establish database connection
@@ -82,6 +86,7 @@ def fetch_all_matches(current_user_id, conn):
             "location": match['location'],
             "email": match['email'],
             "interests": interests_array,
+            "image_path": match['image_path'],
         })
     return all_matches
 
@@ -461,4 +466,38 @@ async def update_age_preference(
     # Redirect to dashboard once preferences are submitted
     return RedirectResponse(url="/dashboard", status_code=302)
 
+@app.post("/upload-picture")
+async def upload_picture(request: Request, picture: UploadFile = File(...)):
+    # Ensure the upload directory exists
+    if not os.path.exists(UPLOAD_DIRECTORY):
+        os.makedirs(UPLOAD_DIRECTORY)
+
+    # Construct the file path
+    file_path = os.path.join(UPLOAD_DIRECTORY, picture.filename)
+
+    try:
+        # Write the uploaded file to the specific path
+        with open(file_path, "wb") as buffer:
+            buffer.write(await picture.read())
+
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"File upload failed: {str(e)}")
+    
+    # Store data in dictionary
+    userData = {
+        'image_path': file_path
+    }
+
+    user_profile = UserProfile()
+
+    # Fetch user id and edit the user information using the edit_user_profile function
+    email = request.cookies.get("email")
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    cursor.execute("SELECT id FROM users WHERE email = ?", (email,))
+    userId = cursor.fetchone()
+    
+    user_profile.editUser(userId[0],userData)
+
+    return RedirectResponse(url="/dashboard", status_code=302)
 
