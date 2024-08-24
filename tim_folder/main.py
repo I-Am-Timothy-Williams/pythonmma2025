@@ -511,6 +511,8 @@ async def chat(request: Request, email: str, response: Response):
     name = cursor.fetchone()
     cursor.execute("SELECT id FROM users WHERE email = ?", (email,))
     chatuserid = cursor.fetchone()
+
+    # Set relevant cookies for chat feature
     response.set_cookie(key="chatid", value = chatuserid[0])
     response.set_cookie(key="name", value=name[0])
     user_email = request.cookies.get("email")
@@ -537,7 +539,7 @@ async def chat(request: Request, email: str, response: Response):
 @app.post("/send_message")
 async def chat(request: Request, sender_id: str = Form(...), receiver_id: str = Form(...), message: str = Form(...)):
 
-
+    # Fetch user details and chat history based on `email`
     conn = get_db_connection()
     cursor = conn.cursor()
     cursor.execute("SELECT id FROM users WHERE firstName = ?", (receiver_id,))
@@ -550,13 +552,14 @@ async def chat(request: Request, sender_id: str = Form(...), receiver_id: str = 
     
     chatId = Identity.create_id()
 
+    # Insert new chats into userChat table
     try:
         cursor.execute("""
             INSERT INTO userChat (id, sender_id, receiver_id, message, timestamp)
             VALUES (?, ?, ?, ?, CURRENT_TIMESTAMP)
         """, (chatId, sender_id[0], receiver_id[0], message))
         conn.commit()
-
+        # Redirect you to chat page once new messages have been submitted
         return RedirectResponse(url=f"/chat/{email}?email={email}", status_code=302)
     
     except Exception as e:
