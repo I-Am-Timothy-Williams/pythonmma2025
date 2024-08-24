@@ -1,4 +1,4 @@
-from fastapi import FastAPI, Request, Form, HTTPException, Body, UploadFile, File
+from fastapi import FastAPI, Request, Form, HTTPException, Body, UploadFile, File, Response
 from fastapi.responses import RedirectResponse, HTMLResponse
 from fastapi.templating import Jinja2Templates
 from fastapi.staticfiles import StaticFiles
@@ -11,6 +11,7 @@ from urllib.parse import urlencode
 from typing import List
 import json
 from similarity_score import *
+import identity
 import os
 import requests
 
@@ -500,4 +501,69 @@ async def upload_picture(request: Request, picture: UploadFile = File(...)):
     user_profile.editUser(userId[0],userData)
 
     return RedirectResponse(url="/dashboard", status_code=302)
+
+@app.get("/chat/{email}")
+async def chat(request: Request, email: str, response: Response):
+    # Fetch user details and chat history based on `email`
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    cursor.execute("SELECT firstName FROM users WHERE email = ?", (email,))
+    name = cursor.fetchone()
+    cursor.execute("SELECT id FROM users WHERE email = ?", (email,))
+    chatuserid = cursor.fetchone()
+    response.set_cookie(key="chatid", value = chatuserid[0])
+    response.set_cookie(key="name", value=name[0])
+    user_email = request.cookies.get("email")
+    cursor.execute("SELECT id FROM users WHERE email = ?", (user_email,))
+    userId = cursor.fetchone()
+    cursor.execute("SELECT id FROM users WHERE email = ?", (email,))
+    recipientId = cursor.fetchone()
+    
+
+    # Fetch chat history between logged-in user and the selected user
+    cursor.execute("""
+        SELECT u.firstName as sender_name, cm.message, cm.timestamp
+        FROM userChat cm
+        JOIN users u ON cm.sender_id = u.id
+        WHERE (cm.sender_id = ? AND cm.receiver_id = ?) OR (cm.sender_id = ? AND cm.receiver_id = ?)
+        ORDER BY cm.timestamp
+    """, (userId[0], recipientId[0], recipientId[0], userId[0]))
+    chat_history = cursor.fetchall()
+    
+
+    # Return the chat page with these details
+    return templates.TemplateResponse("chat.html", {"name":name[0],"user_email":user_email,"chat_history": chat_history,"request": request})
+
+@app.post("/send_message")
+async def chat(request: Request, sender_id: str = Form(...), receiver_id: str = Form(...), message: str = Form(...)):
+
+
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    cursor.execute("SELECT id FROM users WHERE firstName = ?", (receiver_id,))
+    receiver_id = cursor.fetchone()
+    cursor.execute("SELECT email FROM users WHERE id = ?", (receiver_id[0],))
+    email = cursor.fetchone()
+    email = email[0]
+    cursor.execute("SELECT id FROM users WHERE email = ?", (sender_id,))
+    sender_id = cursor.fetchone()
+    
+    chatId = Identity.create_id()
+
+    try:
+        cursor.execute("""
+            INSERT INTO userChat (id, sender_id, receiver_id, message, timestamp)
+            VALUES (?, ?, ?, ?, CURRENT_TIMESTAMP)
+        """, (chatId, sender_id[0], receiver_id[0], message))
+        conn.commit()
+
+        return RedirectResponse(url=f"/chat/{email}?email={email}", status_code=302)
+    
+    except Exception as e:
+        conn.rollback()
+        raise HTTPException(status_code=500, detail=str(e))
+    finally:
+        conn.close()
+        
+
 
