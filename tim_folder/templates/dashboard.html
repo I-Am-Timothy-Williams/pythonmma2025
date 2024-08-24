@@ -210,6 +210,11 @@
             <form action="/set-location-preference" method="GET" style="display: inline;">
                 <button type="submit" class="btn btn-primary">Location Range</button>
             </form>   
+            <form action="/upload-picture" method="POST" enctype="multipart/form-data" style="display: inline;">
+                <input type="file" name="picture" accept="image/*" style="display: none;" id="upload-picture">
+                <label for="upload-picture" class="btn btn-primary">Upload Picture</label>
+                <button type="submit" class="btn btn-primary">Submit</button>
+            </form>
         </div> 
         </div>
     </div>
