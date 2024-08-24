@@ -12,8 +12,8 @@
     </header>
     <div class="match-container">
         {% for match in all_matches %}
-        <div class="match-card">
-            <img src="{{ match.get('image_path', 'tim_folder\static\cissy.jpeg') }}" alt="{{ match.get('firstName') }}">
+        <a href="/chat/{{ match.get('email') }}" class="match-card">
+            <img src="{{ match.get('image_path', 'tim_folder/static/cissy.jpeg') }}" alt="{{ match.get('firstName') }}">
             <h3>{{ match.get('firstName') }} {{ match.get('lastName') }}</h3>
             <p>Age: {{ match.get('age') }}</p>
             <p>Location: {{ match.get('location') }}</p>
@@ -22,7 +22,7 @@
                     {{ interest.capitalize() }}{% if not loop.last %}, {% endif %}
                 {% endfor %}
             </p>
-        </div>
+        </a>
         {% endfor %}
     </div>
 </body>
