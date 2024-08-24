@@ -261,7 +261,7 @@ The **Location Range** setting allows you to edit the maximum reach of the geogr
 
 The bottom section of the **Dashboard** displays profiles that are matched and pushed to you based on your personal data. The app calculates and identifies the best matches using a similarity score derived from your interests and those of other users.
 
-- You can swipe the profile card left or right, or press the **X** or **heart** icon to indicate interest in the displayed profile and view the next one.
+- You can swipe the profile card left or right to indicate interest in the displayed profile and view the next one.
 - There is a limit on how many profiles you can view based on your filters and the similarity of your interests.
 
 <div align="center">
@@ -278,7 +278,7 @@ The **View Matches** button allows you to see matched profiles that both you and
 
 ### Chat with Matches
 
-If you click on one of your matches, you will be able to open a chat with them and see your messages and their messages.
+If you click on one of your matches, you will be able to open a chat with them and see your messages and their messages. Type out your sentiments in the input box and click **send** to update the chat with new messages.
 
 <div align="center">
     <img width="1180" alt="Screenshot 2024-08-23 at 9 16 47 PM" src="https://i.imgur.com/f1UH9Ib.png">
