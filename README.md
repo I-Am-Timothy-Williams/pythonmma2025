@@ -1,5 +1,5 @@
 # Tinder,But Better 
-## (Please look at submission comments for API key (variable used in main.py and similarity_score.py)
+## (Please look at submission comments for API key (variable used in main.py and similarity_score.py))
 This repository contains a Python-based matching application that calculates and displays user matches based on similarity scores. The app is modular, with separate files for data models, schemas, similarity score calculations, and user interactions.
 
 ## Project Structure
