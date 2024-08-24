@@ -71,12 +71,7 @@ def get_interests(db_name='tinder.db', valid_user_ids=None,user_id=None):
             WHERE id IN ({valid_user_ids_str})
               AND id NOT IN ({exclusion_subquery})
         """, valid_user_ids + [user_id, user_id])
-        # cursor.execute(f"""
-        #     SELECT id, interests 
-        #     FROM users 
-        #     WHERE id IN ({','.join('?' * len(valid_user_ids))})
-        # """, valid_user_ids)
-        #Potential issue of interests getting ordered inversely
+
         rows = cursor.fetchall()
 
         # We are only concerned about the interests from the rows, so that is what we are getting by taking row[0]
@@ -198,11 +193,7 @@ def get_users_in_age_range(db_name = 'tinder.db', user_id = None, min_age=None, 
 
     # Search for users in between age range
     try:
-        # cursor.execute("""
-        #     SELECT id,location
-        #     FROM users 
-        #     WHERE age BETWEEN ? AND ?
-        # """, (min_age, max_age))
+        
          # Construct exclusion subquery to avoid users that have been liked or disliked
         exclusion_subquery = """
             SELECT userLikes FROM userLikes WHERE userId = ?
