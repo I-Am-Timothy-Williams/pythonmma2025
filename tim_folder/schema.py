@@ -89,9 +89,32 @@ def create_userMatches_table():
     conn.commit()
     conn.close()
     return
+def create_userChat():
+    # Connect to the database
+    conn = sqlite3.connect('tinder.db')
+    cursor = conn.cursor()
+
+    # Create the userChat table
+    cursor.execute('''
+    CREATE TABLE IF NOT EXISTS userChat(
+    id INTEGER PRIMARY KEY AUTOINCREMENT,  -- Unique identifier for each message
+    sender_id INTEGER NOT NULL,           -- ID of the user who sent the message
+    receiver_id INTEGER NOT NULL,         -- ID of the user who receives the message
+    message TEXT NOT NULL,                -- Content of the message
+    timestamp DATETIME DEFAULT CURRENT_TIMESTAMP, -- Time when the message was sent
+    FOREIGN KEY (sender_id) REFERENCES users(id),  -- Reference to the users table
+    FOREIGN KEY (receiver_id) REFERENCES users(id)   -- Reference to the users table
+    )
+''')
+
+    # Commit and close the connection
+    conn.commit()
+    conn.close()
+    return
 create_users_table()
 create_userLikes_table()
 create_userDislikes_table()
 create_userMatches_table()
+create_userChat()
 
 
