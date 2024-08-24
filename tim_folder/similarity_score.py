@@ -44,7 +44,7 @@ def get_lat_lng(location_name, api_key):
     else:
         return None, None
     
-def get_interests(db_name='tinder.db', valid_user_ids=None):
+def get_interests(db_name='tinder.db', valid_user_ids=None,user_id=None):
     # If there are no valid users return an empty list
     if not valid_user_ids:
         return []
@@ -55,15 +55,33 @@ def get_interests(db_name='tinder.db', valid_user_ids=None):
     
     # For each valid user, get their interests
     try:
-        cursor.execute("SELECT interests FROM users WHERE id IN ({})".format(
-        ','.join('?' * len(valid_user_ids))
-    ),
-    valid_user_ids
-)       #Potential issue of interests getting ordered inversely
+         # Prepare the exclusion subquery
+        exclusion_subquery = """
+            SELECT userLikes FROM userLikes WHERE userId = ?
+            UNION
+            SELECT userDislikes FROM userDislikes WHERE userId = ?
+        """
+        
+        # Construct the query string for valid_user_ids
+        valid_user_ids_str = ','.join('?' * len(valid_user_ids))
+
+        cursor.execute(f"""
+            SELECT id, interests
+            FROM users 
+            WHERE id IN ({valid_user_ids_str})
+              AND id NOT IN ({exclusion_subquery})
+        """, valid_user_ids + [user_id, user_id])
+        # cursor.execute(f"""
+        #     SELECT id, interests 
+        #     FROM users 
+        #     WHERE id IN ({','.join('?' * len(valid_user_ids))})
+        # """, valid_user_ids)
+        #Potential issue of interests getting ordered inversely
         rows = cursor.fetchall()
 
         # We are only concerned about the interests from the rows, so that is what we are getting by taking row[0]
-        interests = [row[0] for row in rows]
+        interests_dict = {row[0]: row[1] for row in rows}
+        interests = [interests_dict[user_id] for user_id in valid_user_ids]
     except sqlite3.Error as e:
         print(f"Database error: {e}")
         interests = []
@@ -111,7 +129,7 @@ def calculate_similarity(db_name='tinder.db',user_id = None,min_age=None,max_age
         return []
 
     # Get interests of valid users
-    interests = get_interests(db_name, valid_user_ids)
+    interests = get_interests(db_name, valid_user_ids,user_id)
 
     # Check for valid user interests
     if not interests:
@@ -153,7 +171,6 @@ def calculate_similarity(db_name='tinder.db',user_id = None,min_age=None,max_age
     # Sort the order in which users show up to you based on their score
     user_scores.sort(key=lambda x: x[1], reverse=True)
     sorted_users = [user for user, score in user_scores]
-
     return sorted_users
 
         
@@ -181,11 +198,24 @@ def get_users_in_age_range(db_name = 'tinder.db', user_id = None, min_age=None, 
 
     # Search for users in between age range
     try:
-        cursor.execute("""
-            SELECT id,location
+        # cursor.execute("""
+        #     SELECT id,location
+        #     FROM users 
+        #     WHERE age BETWEEN ? AND ?
+        # """, (min_age, max_age))
+         # Construct exclusion subquery to avoid users that have been liked or disliked
+        exclusion_subquery = """
+            SELECT userLikes FROM userLikes WHERE userId = ?
+            UNION
+            SELECT userDislikes FROM userDislikes WHERE userId = ?
+        """
+        
+        cursor.execute(f"""
+            SELECT id, location
             FROM users 
-            WHERE age BETWEEN ? AND ?
-        """, (min_age, max_age))
+            WHERE age BETWEEN ? AND ? 
+              AND id NOT IN ({exclusion_subquery})
+        """, (min_age, max_age, user_id, user_id))
 
         # Store all valid users in rows
         rows = cursor.fetchall()
@@ -200,6 +230,9 @@ def get_users_in_age_range(db_name = 'tinder.db', user_id = None, min_age=None, 
         cursor.execute("SELECT location_preference FROM users WHERE id = ?", (user_id,))
         max_distance = cursor.fetchone()
         
+        if max_distance[0] is None:
+            max_distance = [1,0]
+
         # Initialize final list of valid users
         result = []
         
@@ -214,7 +247,6 @@ def get_users_in_age_range(db_name = 'tinder.db', user_id = None, min_age=None, 
                 result.append(row[0])
             elif max_distance == None:
                 result.append(row[0])
-        # result = [row for row in rows if row[0] != user_id]
         
         return result
     
