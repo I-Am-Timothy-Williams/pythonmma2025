@@ -268,3 +268,11 @@ The **View Matches** button allows you to see matched profiles that both you and
 <div align="center">
     <img width="1180" alt="Screenshot 2024-08-23 at 9 16 47 PM" src="https://github.com/user-attachments/assets/dd42004d-b44f-4588-ac56-064a374eb111">
 </div>
+
+### Chat with Matches
+
+If you click on one of your matches, you will be able to open a chat with them and see your messages and their messages.
+
+<div align="center">
+    <img width="1180" alt="Screenshot 2024-08-23 at 9 16 47 PM" src="https://i.imgur.com/f1UH9Ib.png">
+</div>
