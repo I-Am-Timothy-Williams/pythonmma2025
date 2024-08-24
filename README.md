@@ -166,15 +166,105 @@ The following packages are required for this project:
 After installation, you can start using the application with the following command:
 
 ```bash
-python main.py
+fastapi dev tim_folder/main.py        
 ```
 
 
 ## Usage
-1. **Input User Data: Enter user data when prompted by the application.**
-2. **Run Matching: The app calculates and identifies the best matches based on the similarity score.**
-3. **View Results: Matches are displayed in order of relevance.**
-4. !!!!! **Add more description use gif and pictiure to show how to use program**
+1. **Input User Data:** Enter user data when prompted by the application.
+
+<div align="center">
+<img width="610" alt="Screenshot 2024-08-23 at 9 03 36 PM" src="https://github.com/user-attachments/assets/30a53196-4d4a-4958-a9bb-2ee7ede3c152">
+</div>
+
+**Login Page** prompts you to enter your email (emails are used for user identification if no username is set) and password to log in.
+
+- For first-time users, please click **Register** at the bottom of the Login prompt to direct to the register page.
+- For first-time logins, you’ll be prompted to select at least one of your **Interests** (out of a range of interest categories) to describe your hobbies and for matching people with similar interests.
+
+2. **Registration**
+
+To register, enter the following details:
+
+<div align="center">
+  <img width="615" alt="Screenshot 2024-08-23 at 9 08 13 PM" src="https://github.com/user-attachments/assets/514b59c9-2173-4c6b-b169-26d696b82036">
+</div>
 
 
+- **First Name**
+- **Last Name**
+- **Email** (used for identification if no username is set)
+- **Age** (an integer)
+- **Gender** (choose between "male"/"female")
+- **Location** (address can be entered to improve matching accuracy, or you can enter general city/country for privacy purposes)
+- **Username** (required for login)
+- **Password** (required for login)
 
+Most importantly, please set up a username and password to log in and access the app.
+
+
+3. **Dashboard**
+
+The **Dashboard** allows you to view, edit, delete, and fill in more details for your profile.
+
+<div align="center">
+    <img width="491" alt="Screenshot 2024-08-23 at 9 11 20 PM" src="https://github.com/user-attachments/assets/07aa7d67-caaf-4f7d-8e9c-0d17843262e4">
+</div>
+
+- The top part of the **Dashboard** shows your profile information, including your name, email, location, age, and interests.
+- You can use the buttons to:
+  - **Edit Profile**
+  - **Delete Profile**
+  - **Set Age Range**
+  - **Set Location Range**
+
+### Editing Your Profile
+
+If you click **Edit Profile**, a new prompt will appear, allowing you to update individual components that you entered during the registration stage. The **Interests** section can be edited into any free-typed interest for a better description of your interests. 
+
+After making changes, click **Save Changes** to store your updates and return to the Dashboard.
+
+<div align="center">
+    <img width="489" alt="Screenshot 2024-08-23 at 9 12 17 PM" src="https://github.com/user-attachments/assets/612a3ea7-de04-47d2-941a-dbd7d8c0aa03">
+
+</div>
+
+### Delete Profile
+
+The **Delete Profile** button will prompt you with a confirmation pop-up. If you agree to the prompt, your profile information will be permanently deleted from the database. You will then be immediately logged out and redirected to the login page.
+
+### Age Range
+
+The **Age Range** setting allows you to edit the minimum and maximum age of the people you want to see as profiles are pushed to you. This acts as a filter, ensuring that no profiles outside your selected age range will appear. Click **Save Preferences** to activate this filter, store your updates, and return to the Dashboard.
+
+<div align="center">
+    <img width="214" alt="Screenshot 2024-08-23 at 9 14 41 PM" src="https://github.com/user-attachments/assets/0a0fc3ae-f6c6-47c0-86cf-22aa6338a3c3">
+</div>
+
+### Location Range
+
+The **Location Range** setting allows you to edit the maximum reach of the geographical location you want to see as profiles are pushed to you. Similar to the Age Range, this setting acts as a filter, ensuring no profiles outside your selected range will appear. Click **Update Radius** to visualize the range using our Google Maps plugin function. You can also enter specific addresses to visualize the radius/distances. Click **Save Preferences** to activate this filter, store your updates, and return to the Dashboard.
+
+<div align="center">
+    <img width="270" alt="Screenshot 2024-08-23 at 9 15 06 PM" src="https://github.com/user-attachments/assets/9aef6c44-2874-4e37-a0af-44dd43dd217d">
+
+</div>
+
+### Dashboard - Profile Matching
+
+The bottom section of the **Dashboard** displays profiles that are matched and pushed to you based on your personal data. The app calculates and identifies the best matches using a similarity score derived from your interests and those of other users.
+
+- You can swipe the profile card left or right, or press the **X** or **heart** icon to indicate interest in the displayed profile and view the next one.
+- There is a limit on how many profiles you can view based on your filters and the similarity of your interests.
+
+<div align="center">
+    <img width="487" alt="Screenshot 2024-08-23 at 9 16 22 PM" src="https://github.com/user-attachments/assets/72174679-47a6-4b24-8083-171995fdf76a">
+</div>
+
+### View Matches
+
+The **View Matches** button allows you to see matched profiles that both you and the other user liked (both users need to click the heart icon or swipe right). Matches are displayed in order of relevance and the extent to which they match your interests.
+
+<div align="center">
+    <img width="1180" alt="Screenshot 2024-08-23 at 9 16 47 PM" src="https://github.com/user-attachments/assets/dd42004d-b44f-4588-ac56-064a374eb111">
+</div>
